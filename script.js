@@ -4,6 +4,7 @@ class GestaoResiduosApp {
     constructor() {
         this.currentTab = 'dashboard';
         this.charts = {};
+        this.dataTables = {};
         this.data = {
             descaracterizacao: [],
             doacoes: [],
@@ -56,6 +57,24 @@ class GestaoResiduosApp {
             { ano: '2024', mes: 'NOV', peso: 13460, mesNum: 11 },
             { ano: '2024', mes: 'DEZ', peso: 14445, mesNum: 12 }
         ];
+        
+        this.calcularAcumuladosDescaracterizacao();
+    }
+
+    calcularAcumuladosDescaracterizacao() {
+        const anos = [...new Set(this.data.descaracterizacao.map(item => item.ano))];
+        
+        anos.forEach(ano => {
+            const dadosAno = this.data.descaracterizacao
+                .filter(item => item.ano === ano)
+                .sort((a, b) => a.mesNum - b.mesNum);
+            
+            let acumulado = 0;
+            dadosAno.forEach(item => {
+                acumulado += item.peso;
+                item.acumuladoAno = acumulado;
+            });
+        });
     }
 
     loadDoacoesData() {
@@ -82,6 +101,24 @@ class GestaoResiduosApp {
             { ano: '2024', mes: 'OUT', quantidade: 154, programa: 'Sustentare', mesNum: 10 },
             { ano: '2024', mes: 'NOV', quantidade: 408, programa: 'Sustentare', mesNum: 11 }
         ];
+        
+        this.calcularAcumuladosDoacoes();
+    }
+
+    calcularAcumuladosDoacoes() {
+        const anos = [...new Set(this.data.doacoes.map(item => item.ano))];
+        
+        anos.forEach(ano => {
+            const dadosAno = this.data.doacoes
+                .filter(item => item.ano === ano)
+                .sort((a, b) => a.mesNum - b.mesNum);
+            
+            let acumulado = 0;
+            dadosAno.forEach(item => {
+                acumulado += item.quantidade;
+                item.acumuladoAno = acumulado;
+            });
+        });
     }
 
     loadRecebedoresData() {
@@ -134,16 +171,6 @@ class GestaoResiduosApp {
             });
         });
 
-        // Filtros
-        document.getElementById('filterAnoDescaracterizacao')?.addEventListener('change', () => this.filterDescaracterizacao());
-        document.getElementById('filterMesDescaracterizacao')?.addEventListener('change', () => this.filterDescaracterizacao());
-        
-        document.getElementById('filterAnoDoacoes')?.addEventListener('change', () => this.filterDoacoes());
-        document.getElementById('filterMesDoacoes')?.addEventListener('change', () => this.filterDoacoes());
-        
-        document.getElementById('filterAnoRecebedores')?.addEventListener('change', () => this.filterRecebedores());
-        document.getElementById('filterEntidade')?.addEventListener('input', () => this.filterRecebedores());
-
         console.log('✅ Event listeners configurados');
     }
 
@@ -185,19 +212,19 @@ class GestaoResiduosApp {
                 this.initializeDashboard();
                 break;
             case 'descaracterizacao':
-                this.initializeDescaracterizacao();
+                this.createDescaracterizacaoContent();
                 break;
             case 'doacoes':
-                this.initializeDoacoes();
+                this.createDoacoesContent();
                 break;
             case 'recebedores':
-                this.initializeRecebedores();
+                this.createRecebedoresContent();
                 break;
             case 'materiais':
-                this.initializeMateriais();
+                this.createMateriaisContent();
                 break;
             case 'novo-dado':
-                this.initializeNovoDado();
+                this.createNovoDadoContent();
                 break;
         }
     }
@@ -206,31 +233,6 @@ class GestaoResiduosApp {
         console.log('📈 Inicializando Dashboard...');
         this.createDashboardCharts();
         this.initializeDashboardTables();
-    }
-
-    initializeDescaracterizacao() {
-        console.log('🗑️ Inicializando Descaracterização...');
-        this.createDescaracterizacaoContent();
-    }
-
-    initializeDoacoes() {
-        console.log('💻 Inicializando Doações...');
-        this.createDoacoesContent();
-    }
-
-    initializeRecebedores() {
-        console.log('🏢 Inicializando Entidades...');
-        this.createRecebedoresContent();
-    }
-
-    initializeMateriais() {
-        console.log('🔧 Inicializando Materiais...');
-        this.createMateriaisContent();
-    }
-
-    initializeNovoDado() {
-        console.log('➕ Inicializando Novo Dado...');
-        this.createNovoDadoContent();
     }
 
     createDescaracterizacaoContent() {
@@ -261,7 +263,9 @@ class GestaoResiduosApp {
                     <option value="NOV">Novembro</option>
                     <option value="DEZ">Dezembro</option>
                 </select>
-                <button id="btnExportDescaracterizacao" class="btn-export">📥 Exportar CSV</button>
+                <input type="text" id="searchDescaracterizacao" placeholder="🔍 Pesquisar...">
+                <button id="btnResetDescaracterizacao" class="btn-reset">🔄 Limpar</button>
+                <button id="btnExportDescaracterizacao" class="btn-export">📊 Exportar Excel</button>
             </div>
 
             <div class="table-responsive">
@@ -272,7 +276,7 @@ class GestaoResiduosApp {
                             <th>Mês</th>
                             <th>Peso (Kg)</th>
                             <th>Acumulado Anual</th>
-                            <th>Variação</th>
+                            <th>Variação Mensal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -281,26 +285,29 @@ class GestaoResiduosApp {
                                 <td>${item.ano}</td>
                                 <td>${item.mes}</td>
                                 <td>${item.peso.toLocaleString('pt-BR')}</td>
-                                <td>${this.calcularAcumuladoAnual(item.ano, item.mesNum).toLocaleString('pt-BR')}</td>
-                                <td>${this.calcularVariacao(item.ano, item.mesNum)}</td>
+                                <td>${item.acumuladoAno.toLocaleString('pt-BR')}</td>
+                                <td>${this.calcularVariacaoMensal(item.ano, item.mesNum)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
 
-            <div class="chart-container-full">
-                <h3>Evolução Mensal da Descaracterização</h3>
-                <canvas id="chartDescaracterizacaoDetalhado" width="400" height="200"></canvas>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Evolução Mensal da Descaracterização</h3>
+                    <canvas id="chartDescaracterizacaoDetalhado" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Comparativo Anual</h3>
+                    <canvas id="chartDescaracterizacaoAnual" width="400" height="200"></canvas>
+                </div>
             </div>
         `;
 
-        // Inicializar DataTable
         this.initializeDescaracterizacaoTable();
-        // Inicializar gráfico
-        this.createDescaracterizacaoDetalhadoChart();
-        // Reconfigurar event listeners dos filtros
-        this.setupFilterListeners();
+        this.createDescaracterizacaoCharts();
+        this.setupDescaracterizacaoFilters();
     }
 
     createDoacoesContent() {
@@ -331,7 +338,15 @@ class GestaoResiduosApp {
                     <option value="NOV">Novembro</option>
                     <option value="DEZ">Dezembro</option>
                 </select>
-                <button id="btnExportDoacoes" class="btn-export">📥 Exportar CSV</button>
+                <select id="filterProgramaDoacoes">
+                    <option value="">Todos os programas</option>
+                    <option value="Sustentare">Sustentare</option>
+                    <option value="Sustentare/SEDES">Sustentare/SEDES</option>
+                    <option value="Sustentare/BANRISUL">Sustentare/BANRISUL</option>
+                </select>
+                <input type="text" id="searchDoacoes" placeholder="🔍 Pesquisar...">
+                <button id="btnResetDoacoes" class="btn-reset">🔄 Limpar</button>
+                <button id="btnExportDoacoes" class="btn-export">📊 Exportar Excel</button>
             </div>
 
             <div class="table-responsive">
@@ -343,6 +358,7 @@ class GestaoResiduosApp {
                             <th>Quantidade</th>
                             <th>Programa</th>
                             <th>Acumulado Anual</th>
+                            <th>% do Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -352,7 +368,8 @@ class GestaoResiduosApp {
                                 <td>${item.mes}</td>
                                 <td>${item.quantidade}</td>
                                 <td>${item.programa}</td>
-                                <td>${this.calcularAcumuladoDoacoes(item.ano, item.mesNum)}</td>
+                                <td>${item.acumuladoAno || '-'}</td>
+                                <td>${this.calcularPercentualDoacoes(item.ano, item.quantidade)}%</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -387,7 +404,7 @@ class GestaoResiduosApp {
         `;
 
         this.initializeDoacoesTable();
-        this.setupFilterListeners();
+        this.setupDoacoesFilters();
     }
 
     createRecebedoresContent() {
@@ -403,9 +420,27 @@ class GestaoResiduosApp {
                     <option value="2023">2023</option>
                     <option value="2024">2024</option>
                 </select>
-                <input type="text" id="filterEntidade" placeholder="Buscar entidade...">
-                <button id="btnExportRecebedores" class="btn-export">📥 Exportar CSV</button>
-                <button id="btnImprimirLista" class="btn-print">🖨️ Imprimir Lista</button>
+                <select id="filterMesRecebedores">
+                    <option value="">Todos os meses</option>
+                    <option value="JAN">Janeiro</option>
+                    <option value="FEV">Fevereiro</option>
+                    <option value="MAR">Março</option>
+                    <option value="ABR">Abril</option>
+                    <option value="MAI">Maio</option>
+                    <option value="JUN">Junho</option>
+                    <option value="JUL">Julho</option>
+                    <option value="AGO">Agosto</option>
+                    <option value="SET">Setembro</option>
+                    <option value="OUT">Outubro</option>
+                    <option value="NOV">Novembro</option>
+                    <option value="DEZ">Dezembro</option>
+                </select>
+                <input type="text" id="filterEntidade" placeholder="🔍 Buscar entidade...">
+                <input type="number" id="filterQuantidadeMin" placeholder="Quantidade mínima">
+                <input type="number" id="filterQuantidadeMax" placeholder="Quantidade máxima">
+                <button id="btnResetRecebedores" class="btn-reset">🔄 Limpar</button>
+                <button id="btnExportRecebedores" class="btn-export">📊 Exportar Excel</button>
+                <button id="btnImprimirLista" class="btn-print">🖨️ Imprimir</button>
             </div>
 
             <div class="table-responsive">
@@ -417,6 +452,7 @@ class GestaoResiduosApp {
                             <th>Data Entrega</th>
                             <th>Ano</th>
                             <th>Mês</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -427,6 +463,7 @@ class GestaoResiduosApp {
                                 <td>${new Date(item.data).toLocaleDateString('pt-BR')}</td>
                                 <td>${item.ano}</td>
                                 <td>${item.mes}</td>
+                                <td>${this.getClassificacaoQuantidade(item.quantidade)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -447,7 +484,7 @@ class GestaoResiduosApp {
 
         this.initializeRecebedoresTable();
         this.createRecebedoresCharts();
-        this.setupFilterListeners();
+        this.setupRecebedoresFilters();
     }
 
     createMateriaisContent() {
@@ -457,12 +494,23 @@ class GestaoResiduosApp {
         content.innerHTML = `
             <h2>🔧 Materiais Reciclados</h2>
             
+            <div class="filters-row">
+                <input type="text" id="searchMateriais" placeholder="🔍 Pesquisar material...">
+                <input type="number" id="filterPesoMin" placeholder="Peso mínimo (Kg)">
+                <input type="number" id="filterPesoMax" placeholder="Peso máximo (Kg)">
+                <input type="number" id="filterPercentualMin" placeholder="% mínimo">
+                <input type="number" id="filterPercentualMax" placeholder="% máximo">
+                <button id="btnResetMateriais" class="btn-reset">🔄 Limpar</button>
+                <button id="btnExportMateriais" class="btn-export">📊 Exportar Excel</button>
+            </div>
+
             <div class="materials-grid">
                 ${this.data.materiais.map(item => `
                     <div class="material-card">
                         <h3>${item.material}</h3>
                         <div class="material-value">${item.peso.toLocaleString('pt-BR')} Kg</div>
                         <div class="material-percent">${item.percentual}% do total</div>
+                        <div class="material-valor">R$ ${this.calcularValorEstimado(item.peso).toLocaleString('pt-BR')}</div>
                     </div>
                 `).join('')}
             </div>
@@ -486,6 +534,7 @@ class GestaoResiduosApp {
                             <th>Peso (Kg)</th>
                             <th>Percentual</th>
                             <th>Valor Estimado</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -495,6 +544,7 @@ class GestaoResiduosApp {
                                 <td>${item.peso.toLocaleString('pt-BR')}</td>
                                 <td>${item.percentual}%</td>
                                 <td>R$ ${this.calcularValorEstimado(item.peso).toLocaleString('pt-BR')}</td>
+                                <td>${this.getClassificacaoMaterial(item.percentual)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -504,133 +554,188 @@ class GestaoResiduosApp {
 
         this.initializeMateriaisTable();
         this.createMateriaisCharts();
+        this.setupMateriaisFilters();
     }
 
-    createNovoDadoContent() {
-        const content = document.getElementById('novo-dado');
-        if (!content) return;
+    // MÉTODOS DE INICIALIZAÇÃO DAS TABELAS COM EXPORTAÇÃO
+    initializeDescaracterizacaoTable() {
+        if (this.dataTables.descaracterizacao) {
+            this.dataTables.descaracterizacao.destroy();
+        }
 
-        content.innerHTML = `
-            <h2>➕ Incluir Novo Dado</h2>
-            
-            <div class="form-container">
-                <div class="form-tabs">
-                    <button class="form-tab-btn active" data-form="descaracterizacao">Descaracterização</button>
-                    <button class="form-tab-btn" data-form="doacao">Doação</button>
-                    <button class="form-tab-btn" data-form="entidade">Nova Entidade</button>
-                </div>
-
-                <form id="formDescaracterizacao" class="data-form active">
-                    <div class="form-group">
-                        <label for="anoDescaracterizacao">Ano:</label>
-                        <select id="anoDescaracterizacao" required>
-                            <option value="">Selecione o ano</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="mesDescaracterizacao">Mês:</label>
-                        <select id="mesDescaracterizacao" required>
-                            <option value="">Selecione o mês</option>
-                            <option value="JAN">Janeiro</option>
-                            <option value="FEV">Fevereiro</option>
-                            <option value="MAR">Março</option>
-                            <option value="ABR">Abril</option>
-                            <option value="MAI">Maio</option>
-                            <option value="JUN">Junho</option>
-                            <option value="JUL">Julho</option>
-                            <option value="AGO">Agosto</option>
-                            <option value="SET">Setembro</option>
-                            <option value="OUT">Outubro</option>
-                            <option value="NOV">Novembro</option>
-                            <option value="DEZ">Dezembro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="pesoKg">Peso (Kg):</label>
-                        <input type="number" id="pesoKg" step="0.01" required>
-                    </div>
-                    <button type="submit" class="btn-submit">➕ Adicionar Dado</button>
-                </form>
-
-                <form id="formDoacao" class="data-form">
-                    <div class="form-group">
-                        <label for="anoDoacao">Ano:</label>
-                        <select id="anoDoacao" required>
-                            <option value="">Selecione o ano</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="mesDoacao">Mês:</label>
-                        <select id="mesDoacao" required>
-                            <option value="">Selecione o mês</option>
-                            <option value="JAN">Janeiro</option>
-                            <option value="FEV">Fevereiro</option>
-                            <option value="MAR">Março</option>
-                            <option value="ABR">Abril</option>
-                            <option value="MAI">Maio</option>
-                            <option value="JUN">Junho</option>
-                            <option value="JUL">Julho</option>
-                            <option value="AGO">Agosto</option>
-                            <option value="SET">Setembro</option>
-                            <option value="OUT">Outubro</option>
-                            <option value="NOV">Novembro</option>
-                            <option value="DEZ">Dezembro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantidadeDoacao">Quantidade:</label>
-                        <input type="number" id="quantidadeDoacao" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="programaDoacao">Programa:</label>
-                        <select id="programaDoacao" required>
-                            <option value="Sustentare">Sustentare</option>
-                            <option value="Sustentare/SEDES">Sustentare/SEDES</option>
-                            <option value="Sustentare/BANRISUL">Sustentare/BANRISUL</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-submit">➕ Adicionar Doação</button>
-                </form>
-
-                <form id="formEntidade" class="data-form">
-                    <div class="form-group">
-                        <label for="nomeEntidade">Nome da Entidade:</label>
-                        <input type="text" id="nomeEntidade" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantidadeEntidade">Quantidade:</label>
-                        <input type="number" id="quantidadeEntidade" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dataEntrega">Data da Entrega:</label>
-                        <input type="date" id="dataEntrega" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="anoEntidade">Ano:</label>
-                        <select id="anoEntidade" required>
-                            <option value="">Selecione o ano</option>
-                            <option value="2024">2024</option>
-                            <option value="2025">2025</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-submit">➕ Cadastrar Entidade</button>
-                </form>
-            </div>
-        `;
-
-        this.setupFormListeners();
+        this.dataTables.descaracterizacao = $('#tabelaDescaracterizacao').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '📊 Exportar Excel',
+                    className: 'btn-export',
+                    title: 'Descaracterizacao_Sustentare'
+                },
+                {
+                    extend: 'pdf',
+                    text: '📄 Exportar PDF',
+                    className: 'btn-export'
+                },
+                {
+                    extend: 'print',
+                    text: '🖨️ Imprimir',
+                    className: 'btn-print'
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json',
+                search: "Pesquisar:",
+                lengthMenu: "Mostrar _MENU_ registros por página",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    first: "Primeiro",
+                    last: "Último",
+                    next: "Próximo",
+                    previous: "Anterior"
+                }
+            },
+            pageLength: 25,
+            order: [[0, 'desc'], [1, 'asc']]
+        });
     }
 
-    // ... (os métodos restantes de inicialização de tabelas, gráficos e cálculos continuam aqui)
-    // [Manter todos os outros métodos existentes: initializeDataTables, createDashboardCharts, etc.]
-}
+    initializeDoacoesTable() {
+        if (this.dataTables.doacoes) {
+            this.dataTables.doacoes.destroy();
+        }
 
-// Inicializar a aplicação quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DOM CARREGADO - INICIANDO APLICAÇÃO ===');
-    window.app = new GestaoResiduosApp();
-});
+        this.dataTables.doacoes = $('#tabelaDoacoes').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '📊 Exportar Excel',
+                    className: 'btn-export',
+                    title: 'Doacoes_Sustentare'
+                },
+                {
+                    extend: 'pdf',
+                    text: '📄 Exportar PDF',
+                    className: 'btn-export'
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+            },
+            pageLength: 25,
+            order: [[0, 'desc'], [1, 'asc']]
+        });
+    }
+
+    initializeRecebedoresTable() {
+        if (this.dataTables.recebedores) {
+            this.dataTables.recebedores.destroy();
+        }
+
+        this.dataTables.recebedores = $('#tabelaRecebedores').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '📊 Exportar Excel',
+                    className: 'btn-export',
+                    title: 'Entidades_Sustentare'
+                },
+                {
+                    extend: 'pdf',
+                    text: '📄 Exportar PDF',
+                    className: 'btn-export'
+                },
+                {
+                    extend: 'print',
+                    text: '🖨️ Imprimir',
+                    className: 'btn-print'
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+            },
+            pageLength: 25,
+            order: [[2, 'desc']]
+        });
+    }
+
+    initializeMateriaisTable() {
+        if (this.dataTables.materiais) {
+            this.dataTables.materiais.destroy();
+        }
+
+        this.dataTables.materiais = $('#tabelaMateriaisCompleta').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '📊 Exportar Excel',
+                    className: 'btn-export',
+                    title: 'Materiais_Sustentare'
+                },
+                {
+                    extend: 'pdf',
+                    text: '📄 Exportar PDF',
+                    className: 'btn-export'
+                }
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+            },
+            pageLength: 25,
+            order: [[1, 'desc']]
+        });
+    }
+
+    // MÉTODOS DE FILTROS
+    setupDescaracterizacaoFilters() {
+        const filterAno = document.getElementById('filterAnoDescaracterizacao');
+        const filterMes = document.getElementById('filterMesDescaracterizacao');
+        const searchInput = document.getElementById('searchDescaracterizacao');
+        const btnReset = document.getElementById('btnResetDescaracterizacao');
+        const btnExport = document.getElementById('btnExportDescaracterizacao');
+
+        if (filterAno) {
+            filterAno.addEventListener('change', () => this.filterDescaracterizacao());
+        }
+        if (filterMes) {
+            filterMes.addEventListener('change', () => this.filterDescaracterizacao());
+        }
+        if (searchInput) {
+            searchInput.addEventListener('input', () => this.filterDescaracterizacao());
+        }
+        if (btnReset) {
+            btnReset.addEventListener('click', () => this.resetDescaracterizacaoFilters());
+        }
+        if (btnExport) {
+            btnExport.addEventListener('click', () => this.exportDescaracterizacaoExcel());
+        }
+    }
+
+    filterDescaracterizacao() {
+        const ano = document.getElementById('filterAnoDescaracterizacao')?.value || '';
+        const mes = document.getElementById('filterMesDescaracterizacao')?.value || '';
+        const search = document.getElementById('searchDescaracterizacao')?.value.toLowerCase() || '';
+
+        this.dataTables.descaracterizacao.column(0).search(ano, true, false);
+        this.dataTables.descaracterizacao.column(1).search(mes, true, false);
+        
+        // Pesquisa global
+        this.dataTables.descaracterizacao.search(search).draw();
+    }
+
+    resetDescaracterizacaoFilters() {
+        document.getElementById('filterAnoDescaracterizacao').value = '';
+        document.getElementById('filterMesDescaracterizacao').value = '';
+        document.getElementById('searchDescaracterizacao').value = '';
+        this.filterDescaracterizacao();
+    }
+
+    exportDescaracterizacaoExcel() {
+        this.dataTables.descaracterizacao.button('.buttons-excel').trigger
