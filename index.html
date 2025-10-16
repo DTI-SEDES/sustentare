@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Resíduos Eletrônicos - DTI/RS</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="assets/logo-rs.png" alt="Logo RS" class="logo">
+            <h1>Gestão de Resíduos Eletrônicos - DTI/RS</h1>
+            <p>Programa de Descaracterização e Doação de Equipamentos - 2017 a 2025</p>
+            <div class="header-info">
+                <span class="update-info">Atualizado em: <strong id="update-date">30/09/2025</strong></span>
+                <span class="total-info">Total Geral: <strong>1.793.484 Kg</strong></span>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <div class="nav-tabs">
+                <button class="nav-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-tab="descaracterizacao">🗑️ Descaracterização</button>
+                <button class="nav-btn" data-tab="doacoes">💻 Doações</button>
+                <button class="nav-btn" data-tab="recebedores">🏢 Entidades</button>
+                <button class="nav-btn" data-tab="materiais">🔧 Materiais</button>
+                <button class="nav-btn" data-tab="novo-dado">➕ Novo Dado</button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+                <h2>📈 Dashboard Resumo</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Total Descaracterizado</h3>
+                        <div class="metric-value">1.793.484 Kg</div>
+                        <div class="metric-desc">2017-2025</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Doações</h3>
+                        <div class="metric-value">14.373</div>
+                        <div class="metric-desc">Computadores doados</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Entidades Atendidas</h3>
+                        <div class="metric-value">200+</div>
+                        <div class="metric-desc">Órgãos beneficiados</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Materiais Reciclados</h3>
+                        <div class="metric-value">7 tipos</div>
+                        <div class="metric-desc">Alumínio, Cobre, Ferro, etc.</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Evolução Anual - Descaracterização (Kg)</h3>
+                        <canvas id="chartDescaracterizacaoAnual"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Doações por Ano (Quantidade)</h3>
+                        <canvas id="chartDoacoesAnual"></canvas>
+                    </div>
+                </div>
+
+                <div class="tables-grid">
+                    <div class="table-section">
+                        <h3>Resumo por Ano - Descaracterização</h3>
+                        <table id="tabelaResumoAnual" class="compact display">
+                            <thead>
+                                <tr>
+                                    <th>Ano</th>
+                                    <th>Total (Kg)</th>
+                                    <th>Variação</th>
+                                    <th>Média Mensal</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    
+                    <div class="table-section">
+                        <h3>Top 10 Entidades Recebedoras</h3>
+                        <table id="tabelaTopEntidades" class="compact display">
+                            <thead>
+                                <tr>
+                                    <th>Entidade</th>
+                                    <th>Total Recebido</th>
+                                    <th>Última Entrega</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descaracterização -->
+            <div id="descaracterizacao" class="tab-content">
+                <h2>🗑️ Dados de Descaracterização</h2>
+                
+                <div class="filters-row">
+                    <select id="filterAnoDescaracterizacao">
+                        <option value="">Todos os anos</option>
+                    </select>
+                    <select id="filterMesDescaracterizacao">
+                        <option value="">Todos os meses</option>
+                    </select>
+                    <button id="btnExportDescaracterizacao" class="btn-export">📥 Exportar CSV</button>
+                </div>
+
+                <table id="tabelaDescaracterizacao" class="display compact" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Ano</th>
+                            <th>Mês</th>
+                            <th>Peso (Kg)</th>
+                            <th>Acumulado Anual</th>
+                            <th>Variação Mensal</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <!-- Doações -->
+            <div id="doacoes" class="tab-content">
+                <h2>💻 Doações de Computadores</h2>
+                
+                <div class="filters-row">
+                    <select id="filterAnoDoacoes">
+                        <option value="">Todos os anos</option>
+                    </select>
+                    <select id="filterMesDoacoes">
+                        <option value="">Todos os meses</option>
+                    </select>
+                    <button id="btnExportDoacoes" class="btn-export">📥 Exportar CSV</button>
+                </div>
+
+                <table id="tabelaDoacoes" class="display compact" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Ano</th>
+                            <th>Mês</th>
+                            <th>Quantidade</th>
+                            <th>Acumulado Anual</th>
+                            <th>Programa</th>
+                        </tr>
+                    </thead>
+                </table>
+
+                <div class="info-box">
+                    <h4>📋 Programas de Doação</h4>
+                    <ul>
+                        <li><strong>Sustentare Direto:</strong> 3.616 computadores</li>
+                        <li><strong>Sustentare/SEDES:</strong> 1.290 computadores</li>
+                        <li><strong>Sustentare/BANRISUL:</strong> 9.467 computadores</li>
+                        <li><strong>Total Geral:</strong> 14.373 computadores</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Entidades Recebedoras -->
+            <div id="recebedores" class="tab-content">
+                <h2>🏢 Entidades Beneficiadas</h2>
+                
+                <div class="filters-row">
+                    <select id="filterAnoRecebedores">
+                        <option value="">Todos os anos</option>
+                    </select>
+                    <input type="text" id="filterEntidade" placeholder="Buscar entidade...">
+                    <button id="btnExportRecebedores" class="btn-export">📥 Exportar CSV</button>
+                    <button id="btnImprimirLista" class="btn-print">🖨️ Imprimir Lista</button>
+                </div>
+
+                <table id="tabelaRecebedores" class="display compact" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Entidade</th>
+                            <th>Quantidade</th>
+                            <th>Data Entrega</th>
+                            <th>Ano</th>
+                            <th>Mês</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <!-- Materiais -->
+            <div id="materiais" class="tab-content">
+                <h2>🔧 Materiais Reciclados</h2>
+                
+                <div class="materials-grid">
+                    <div class="material-card">
+                        <h3>Alumínio</h3>
+                        <div class="material-value">233.152 Kg</div>
+                        <div class="material-percent">13%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Cobre</h3>
+                        <div class="material-value">143.478 Kg</div>
+                        <div class="material-percent">8%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Ferro</h3>
+                        <div class="material-value">663.589 Kg</div>
+                        <div class="material-percent">37%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Plástico</h3>
+                        <div class="material-value">376.631 Kg</div>
+                        <div class="material-percent">21%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Placas de Circuito</h3>
+                        <div class="material-value">143.478 Kg</div>
+                        <div class="material-percent">8%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Vidro</h3>
+                        <div class="material-value">125.543 Kg</div>
+                        <div class="material-percent">7%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Papelão</h3>
+                        <div class="material-value">53.804 Kg</div>
+                        <div class="material-percent">3%</div>
+                    </div>
+                    <div class="material-card">
+                        <h3>Outros</h3>
+                        <div class="material-value">53.804 Kg</div>
+                        <div class="material-percent">3%</div>
+                    </div>
+                </div>
+
+                <div class="chart-container-full">
+                    <canvas id="chartMateriais"></canvas>
+                </div>
+            </div>
+
+            <!-- Novo Dado -->
+            <div id="novo-dado" class="tab-content">
+                <h2>➕ Incluir Novo Dado</h2>
+                
+                <div class="form-container">
+                    <div class="form-tabs">
+                        <button class="form-tab-btn active" data-form="descaracterizacao">Descaracterização</button>
+                        <button class="form-tab-btn" data-form="doacao">Doação</button>
+                        <button class="form-tab-btn" data-form="entidade">Nova Entidade</button>
+                    </div>
+
+                    <!-- Form Descaracterização -->
+                    <form id="formDescaracterizacao" class="data-form active">
+                        <div class="form-group">
+                            <label for="anoDescaracterizacao">Ano:</label>
+                            <select id="anoDescaracterizacao" required>
+                                <option value="">Selecione o ano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mesDescaracterizacao">Mês:</label>
+                            <select id="mesDescaracterizacao" required>
+                                <option value="">Selecione o mês</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pesoKg">Peso (Kg):</label>
+                            <input type="number" id="pesoKg" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn-submit">➕ Adicionar Dado</button>
+                    </form>
+
+                    <!-- Form Doação -->
+                    <form id="formDoacao" class="data-form">
+                        <div class="form-group">
+                            <label for="anoDoacao">Ano:</label>
+                            <select id="anoDoacao" required>
+                                <option value="">Selecione o ano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mesDoacao">Mês:</label>
+                            <select id="mesDoacao" required>
+                                <option value="">Selecione o mês</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeDoacao">Quantidade:</label>
+                            <input type="number" id="quantidadeDoacao" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="programaDoacao">Programa:</label>
+                            <select id="programaDoacao" required>
+                                <option value="Sustentare">Sustentare</option>
+                                <option value="Sustentare/SEDES">Sustentare/SEDES</option>
+                                <option value="Sustentare/BANRISUL">Sustentare/BANRISUL</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit">➕ Adicionar Doação</button>
+                    </form>
+
+                    <!-- Form Entidade -->
+                    <form id="formEntidade" class="data-form">
+                        <div class="form-group">
+                            <label for="nomeEntidade">Nome da Entidade:</label>
+                            <input type="text" id="nomeEntidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeEntidade">Quantidade:</label>
+                            <input type="number" id="quantidadeEntidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataEntrega">Data da Entrega:</label>
+                            <input type="date" id="dataEntrega" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="anoEntidade">Ano:</label>
+                            <select id="anoEntidade" required>
+                                <option value="">Selecione o ano</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit">➕ Cadastrar Entidade</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>Governo do Estado do Rio Grande do Sul - Departamento de Tecnologia da Informação</p>
+                <p>Programa de Gestão de Resíduos Eletrônicos | Dados atualizados trimestralmente</p>
+                <p class="footer-contact">Contato: dtisustentabilidade@rs.gov.br</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
