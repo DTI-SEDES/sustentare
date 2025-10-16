@@ -4,18 +4,406 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Programa Sustentare - Relatório de Residuos</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css">
+    <style>
+        /* Reset e configurações básicas */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1e5799 0%, #207cca 51%, #2989d8 100%);
+            color: white;
+            padding: 20px 0;
+            border-bottom: 4px solid #0d3c6a;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-gov {
+            height: 60px;
+            width: auto;
+        }
+
+        .logo-divider {
+            height: 50px;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-sustentare {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .header-title {
+            text-align: right;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Navegação */
+        .main-nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+        }
+
+        .nav-tabs {
+            display: flex;
+            padding: 0 10px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #f0f5ff;
+        }
+
+        .nav-btn.active {
+            border-bottom-color: #1e5799;
+            color: #1e5799;
+            font-weight: bold;
+        }
+
+        /* Conteúdo principal */
+        main {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #1e5799;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Indicadores */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .indicator-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .indicator-card.success {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .indicator-card.warning {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+        }
+
+        .indicator-card.critical {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .indicator-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .indicator-content h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .indicator-desc {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        /* Métricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #1e5799;
+        }
+
+        .metric-card h3 {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1e5799;
+            margin-bottom: 5px;
+        }
+
+        .metric-desc {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        /* Gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-container h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #555;
+            text-align: center;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Tabelas */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .table-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-section h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #1e5799;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9f0ff;
+        }
+
+        /* Mensagens informativas */
+        .info-message {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #0d47a1;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1e5799;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-top: 4px solid #0d3c6a;
+        }
+
+        .footer-content p {
+            margin-bottom: 8px;
+        }
+
+        .footer-contact {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .header-title {
+                text-align: center;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tables-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .indicators-grid, .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div class="header-top">
                 <div class="logo-container">
-                    <img src="assets/logo-rs.png" alt="Governo do RS" class="logo-gov">
+                    <!-- Logo fictício - substitua pelo real -->
+                    <div class="logo-gov" style="width: 100px; height: 60px; background-color: white; display: flex; align-items: center; justify-content: center; color: #1e5799; font-weight: bold;">GOV-RS</div>
                     <div class="logo-divider"></div>
                     <div class="logo-sustentare">
                         <strong>PROGRAMA SUSTENTARE</strong>
@@ -140,7 +528,7 @@
                     <div class="table-section">
                         <h3>Top 5 Entidades Recebedoras</h3>
                         <div class="table-responsive">
-                            <table id="tabelaTopEntidades" class="compact display">
+                            <table id="tabelaTopEntidades">
                                 <thead>
                                     <tr>
                                         <th>Entidade</th>
@@ -182,7 +570,7 @@
                     <div class="table-section">
                         <h3>Materiais Reciclados (Total)</h3>
                         <div class="table-responsive">
-                            <table id="tabelaMateriais" class="compact display">
+                            <table id="tabelaMateriais">
                                 <thead>
                                     <tr>
                                         <th>Material</th>
@@ -223,7 +611,7 @@
                 </div>
             </div>
 
-            <!-- Outras abas (mantenha o conteúdo existente) -->
+            <!-- Outras abas -->
             <div id="descaracterizacao" class="tab-content">
                 <h2>🗑️ Dados de Descaracterização</h2>
                 <div class="info-message">
@@ -270,12 +658,104 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Navegação por abas
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.nav-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove a classe active de todos os botões e conteúdos
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Adiciona a classe active ao botão clicado
+                    button.classList.add('active');
+                    
+                    // Mostra o conteúdo correspondente
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Inicializar gráficos
+            initCharts();
+        });
+
+        // Função para inicializar gráficos
+        function initCharts() {
+            // Gráfico de descaracterização mensal
+            const ctx1 = document.getElementById('chartDescaracterizacao2024').getContext('2d');
+            const chart1 = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    datasets: [{
+                        label: 'Kg Descaracterizados',
+                        data: [18500, 19200, 21000, 19800, 22500, 24000, 23000, 21800, 20500, 19500, 18500, 17500],
+                        backgroundColor: 'rgba(30, 87, 153, 0.7)',
+                        borderColor: 'rgba(30, 87, 153, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Kg'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de doações por programa
+            const ctx2 = document.getElementById('chartDoacoesPrograma').getContext('2d');
+            const chart2 = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Escolas Públicas', 'ONGs', 'Órgãos Públicos', 'Projetos Sociais', 'Outros'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            'rgba(30, 87, 153, 0.8)',
+                            'rgba(65, 131, 215, 0.8)',
+                            'rgba(100, 150, 220, 0.8)',
+                            'rgba(135, 170, 225, 0.8)',
+                            'rgba(170, 190, 230, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(30, 87, 153, 1)',
+                            'rgba(65, 131, 215, 1)',
+                            'rgba(100, 150, 220, 1)',
+                            'rgba(135, 170, 225, 1)',
+                            'rgba(170, 190, 230, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
