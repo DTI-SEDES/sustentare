@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programa Sustentare</title>
+    <title>Sistema de Monitoramento - Programa Sustentare</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --verde-primario: #2E7D32;
@@ -25,11 +27,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        
         .logo-container {
             background-color: var(--branco);
             border-radius: 50%;
@@ -46,32 +43,6 @@
             padding: 5px;
         }
         
-        .tab-content {
-            background: var(--branco);
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            min-height: 500px;
-        }
-        
-        .nav-tabs .nav-link {
-            color: var(--verde-escuro);
-            font-weight: 500;
-            border: none;
-            padding: 15px 25px;
-        }
-        
-        .nav-tabs .nav-link.active {
-            background-color: var(--branco);
-            color: var(--verde-primario);
-            border-bottom: 3px solid var(--verde-primario);
-            font-weight: bold;
-        }
-        
-        .nav-tabs .nav-link:hover {
-            background-color: var(--verde-claro);
-            color: var(--verde-escuro);
-        }
-        
         .page-title {
             color: var(--verde-escuro);
             border-bottom: 2px solid var(--verde-claro);
@@ -79,63 +50,121 @@
             margin-bottom: 25px;
         }
         
-        .btn-primary {
-            background-color: var(--verde-primario);
-            border-color: var(--verde-primario);
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
         }
         
-        .btn-primary:hover {
-            background-color: var(--verde-escuro);
-            border-color: var(--verde-escuro);
+        .card:hover {
+            transform: translateY(-5px);
         }
         
-        .table th {
+        .card-header {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-secundario));
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .indicator-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .indicator-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--verde-primario);
+            margin: 10px 0;
+        }
+        
+        .indicator-trend {
+            font-size: 0.9rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .trend-up {
+            background-color: #e8f5e8;
+            color: var(--verde-primario);
+        }
+        
+        .trend-down {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        
+        .filter-section {
             background-color: var(--verde-claro);
-            color: var(--verde-escuro);
-            border-bottom: 2px solid var(--verde-secundario);
-        }
-        
-        .filtros-container {
-            background-color: var(--verde-claro);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
         }
         
-        .card {
-            border: 1px solid var(--verde-claro);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .card-header {
-            background-color: var(--verde-claro);
-            color: var(--verde-escuro);
-            font-weight: bold;
-        }
-        
-        .stats-card {
-            text-align: center;
-            padding: 20px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--verde-primario), var(--verde-secundario));
-            color: white;
+        .chart-container {
+            position: relative;
+            height: 300px;
             margin-bottom: 20px;
         }
         
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 10px 0;
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
         }
         
-        .form-label {
+        .table th {
+            background-color: var(--verde-primario);
+            color: white;
+        }
+        
+        .progress {
+            height: 8px;
+            margin-top: 5px;
+        }
+        
+        .year-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .year-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--verde-secundario);
+            background: white;
+            color: var(--verde-secundario);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .year-btn.active {
+            background: var(--verde-secundario);
+            color: white;
+        }
+        
+        .kpi-badge {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 5px;
+        }
+        
+        .kpi-met {
+            background-color: var(--verde-claro);
             color: var(--verde-escuro);
-            font-weight: 500;
         }
         
-        .form-control:focus, .form-select:focus {
-            border-color: var(--verde-secundario);
-            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        .kpi-not-met {
+            background-color: #ffcdd2;
+            color: #c62828;
         }
     </style>
 </head>
@@ -147,448 +176,430 @@
                 <div class="logo-container">
                     SUSTENTARE
                 </div>
-                <a class="navbar-brand" href="#">PROGRAMA SUSTENTARE</a>
+                <a class="navbar-brand" href="#">
+                    <strong>PROGRAMA SUSTENTARE</strong><br>
+                    <small>Sistema de Monitoramento de Indicadores</small>
+                </a>
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Início</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sobre</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contato</a>
-                    </li>
-                </ul>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="current-date"></span>
+                </span>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
-        <!-- Cards de Estatísticas -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <i class="fas fa-donate fa-2x"></i>
-                    <div class="stats-number">1.247</div>
-                    <div>Doações Realizadas</div>
+        <!-- Filtros -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Período de Análise</strong></label>
+                    <div class="year-filter">
+                        <div class="year-btn active" data-years="all">Todos</div>
+                        <div class="year-btn" data-years="2023-2025">2023-2025</div>
+                        <div class="year-btn" data-years="2020-2022">2020-2022</div>
+                        <div class="year-btn" data-years="2017-2019">2017-2019</div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <i class="fas fa-hand-holding-heart fa-2x"></i>
-                    <div class="stats-number">89</div>
-                    <div>Entidades Beneficiadas</div>
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Tipo de Indicador</strong></label>
+                    <select class="form-select" id="indicator-type">
+                        <option value="all">Todos os Indicadores</option>
+                        <option value="operacional">Operacionais</option>
+                        <option value="estrategico">Estratégicos</option>
+                        <option value="sustentabilidade">Sustentabilidade</option>
+                    </select>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <i class="fas fa-recycle fa-2x"></i>
-                    <div class="stats-number">562</div>
-                    <div>Itens Descaracterizados</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card">
-                    <i class="fas fa-users fa-2x"></i>
-                    <div class="stats-number">15.328</div>
-                    <div>Pessoas Atendidas</div>
+                <div class="col-md-4">
+                    <label class="form-label"><strong>Status da Meta</strong></label>
+                    <select class="form-select" id="goal-status">
+                        <option value="all">Todos os Status</option>
+                        <option value="met">Meta Atingida</option>
+                        <option value="not-met">Meta Não Atingida</option>
+                        <option value="partial">Parcialmente Atingida</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <!-- Abas -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="doacao-tab" data-bs-toggle="tab" data-bs-target="#doacao" type="button" role="tab">
-                    <i class="fas fa-donate me-2"></i>Doação
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="descaracterizacao-tab" data-bs-toggle="tab" data-bs-target="#descaracterizacao" type="button" role="tab">
-                    <i class="fas fa-recycle me-2"></i>Descaracterização
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="recebedores-tab" data-bs-toggle="tab" data-bs-target="#recebedores" type="button" role="tab">
-                    <i class="fas fa-hand-holding-heart me-2"></i>Recebedores
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content p-4" id="myTabContent">
-            <!-- Aba Doação -->
-            <div class="tab-pane fade show active" id="doacao" role="tabpanel">
-                <h2 class="page-title">Registro de Doação</h2>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Nova Doação
-                            </div>
-                            <div class="card-body">
-                                <form id="formDoacao">
-                                    <div class="mb-3">
-                                        <label for="doador" class="form-label">Doador</label>
-                                        <input type="text" class="form-control" id="doador" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="tipoDoacao" class="form-label">Tipo de Doação</label>
-                                        <select class="form-select" id="tipoDoacao" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="alimentos">Alimentos</option>
-                                            <option value="roupas">Roupas</option>
-                                            <option value="moveis">Móveis</option>
-                                            <option value="eletronicos">Eletrônicos</option>
-                                            <option value="outros">Outros</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="quantidade" class="form-label">Quantidade</label>
-                                        <input type="number" class="form-control" id="quantidade" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="dataDoacao" class="form-label">Data da Doação</label>
-                                        <input type="date" class="form-control" id="dataDoacao" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="observacoes" class="form-label">Observações</label>
-                                        <textarea class="form-control" id="observacoes" rows="3"></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Registrar Doação</button>
-                                </form>
-                            </div>
-                        </div>
+        <!-- Cards de KPIs -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="indicator-card">
+                    <i class="fas fa-recycle fa-2x text-success"></i>
+                    <div class="indicator-value" id="total-itens">1.247</div>
+                    <div>Itens Descaracterizados</div>
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 12% vs ano anterior
                     </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Doações Recentes
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Doador</th>
-                                                <th>Tipo</th>
-                                                <th>Quantidade</th>
-                                                <th>Data</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tabelaDoacoes">
-                                            <!-- Dados serão preenchidos via JavaScript -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="indicator-card">
+                    <i class="fas fa-hand-holding-heart fa-2x text-success"></i>
+                    <div class="indicator-value" id="total-doacoes">89</div>
+                    <div>Entidades Beneficiadas</div>
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 8% vs ano anterior
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="indicator-card">
+                    <i class="fas fa-users fa-2x text-success"></i>
+                    <div class="indicator-value" id="total-pessoas">15.328</div>
+                    <div>Pessoas Atendidas</div>
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 15% vs ano anterior
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="indicator-card">
+                    <i class="fas fa-chart-line fa-2x text-success"></i>
+                    <div class="indicator-value" id="meta-atingida">78%</div>
+                    <div>Meta Anual Atingida</div>
+                    <div class="indicator-trend trend-down">
+                        <i class="fas fa-arrow-down"></i> 5% vs meta
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-2"></i>Evolução dos Indicadores (2017-2025)
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="evolutionChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Aba Descaracterização -->
-            <div class="tab-pane fade" id="descaracterizacao" role="tabpanel">
-                <h2 class="page-title">Processo de Descaracterização</h2>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Nova Descaracterização
-                            </div>
-                            <div class="card-body">
-                                <form id="formDescaracterizacao">
-                                    <div class="mb-3">
-                                        <label for="itemDesc" class="form-label">Item para Descaracterização</label>
-                                        <input type="text" class="form-control" id="itemDesc" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="origemDesc" class="form-label">Origem do Item</label>
-                                        <input type="text" class="form-control" id="origemDesc" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="dataDesc" class="form-label">Data da Descaracterização</label>
-                                        <input type="date" class="form-control" id="dataDesc" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="metodoDesc" class="form-label">Método de Descaracterização</label>
-                                        <select class="form-select" id="metodoDesc" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="reciclagem">Reciclagem</option>
-                                            <option value="reutilizacao">Reutilização</option>
-                                            <option value="descarte">Descarte Adequado</option>
-                                            <option value="outro">Outro</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="responsavelDesc" class="form-label">Responsável</label>
-                                        <input type="text" class="form-control" id="responsavelDesc" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Registrar Descaracterização</button>
-                                </form>
-                            </div>
-                        </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i>Distribuição por Tipo (2024)
                     </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Histórico de Descaracterização
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Item</th>
-                                                <th>Origem</th>
-                                                <th>Método</th>
-                                                <th>Data</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tabelaDescaracterizacao">
-                                            <!-- Dados serão preenchidos via JavaScript -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Aba Recebedores -->
-            <div class="tab-pane fade" id="recebedores" role="tabpanel">
-                <h2 class="page-title">Recebedores</h2>
-                
-                <!-- Filtros -->
-                <div class="filtros-container">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="filtroNome" class="form-label">Nome do Órgão/Entidade</label>
-                            <input type="text" class="form-control" id="filtroNome" placeholder="Filtrar por nome">
-                        </div>
-                        <div class="col-md-2">
-                            <label for="filtroMunicipio" class="form-label">Município</label>
-                            <input type="text" class="form-control" id="filtroMunicipio" placeholder="Filtrar por município">
-                        </div>
-                        <div class="col-md-2">
-                            <label for="filtroTipo" class="form-label">Tipo de Entidade</label>
-                            <select class="form-select" id="filtroTipo">
-                                <option value="">Todos os tipos</option>
-                                <option value="Município">Município</option>
-                                <option value="Órgão Público">Órgão Público</option>
-                                <option value="Entidade Beneficiada">Entidade Beneficiada</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="filtroData" class="form-label">Data da Entrega</label>
-                            <input type="date" class="form-control" id="filtroData">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button class="btn btn-outline-secondary w-100" onclick="limparFiltros()">
-                                <i class="fas fa-times me-2"></i>Limpar Filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabela de Recebedores -->
+        <!-- Tabela de Indicadores Detalhados -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-table me-2"></i>Indicadores Detalhados 2017-2025
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Nome do Órgão/Entidade Beneficiado</th>
-                                <th>Município</th>
-                                <th>Tipo de Entidade</th>
-                                <th>QTD Atendida</th>
-                                <th>Tot Mês</th>
-                                <th>Data da Entrega</th>
+                                <th>Indicador</th>
+                                <th>Tipo</th>
+                                <th>2021</th>
+                                <th>2022</th>
+                                <th>2023</th>
+                                <th>2024</th>
+                                <th>2025 (Meta)</th>
+                                <th>Status</th>
+                                <th>Tendência</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaRecebedores">
+                        <tbody id="indicators-table">
                             <!-- Dados serão preenchidos via JavaScript -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <!-- Metas por Regional -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="fas fa-map-marker-alt me-2"></i>Desempenho por Regional
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="regionalChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-dark text-light mt-5 py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-6">
-                    <h5>Programa Sustentare</h5>
-                    <p>Sistema de gestão de doações e descaracterização de materiais.</p>
+                <div class="col-md-8">
+                    <h6>Programa Sustentare - Sistema de Monitoramento</h6>
+                    <p class="mb-0">Baseado nos indicadores de 2017 a 2025 - DTI/SEDES</p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <p>&copy; 2024 Programa Sustentare. Todos os direitos reservados.</p>
+                <div class="col-md-4 text-end">
+                    <p class="mb-0">Última atualização: <span id="last-update"></span></p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        // Dados de exemplo
-        const recebedoresExemplo = [
-            {
-                nome: "Associação Comunitária do Bairro X",
-                municipio: "São Paulo",
-                tipo: "Entidade Beneficiada",
-                qtdAtendida: 150,
-                totMes: 450,
-                dataEntrega: "2023-10-15"
-            },
-            {
-                nome: "Prefeitura Municipal",
-                municipio: "Rio de Janeiro",
-                tipo: "Órgão Público",
-                qtdAtendida: 300,
-                totMes: 900,
-                dataEntrega: "2023-10-18"
-            },
-            {
-                nome: "Centro de Apoio à Criança",
-                municipio: "Belo Horizonte",
-                tipo: "Entidade Beneficiada",
-                qtdAtendida: 200,
-                totMes: 600,
-                dataEntrega: "2023-10-20"
-            },
-            {
-                nome: "Secretaria de Assistência Social",
-                municipio: "Salvador",
-                tipo: "Órgão Público",
-                qtdAtendida: 400,
-                totMes: 1200,
-                dataEntrega: "2023-10-22"
-            },
-            {
-                nome: "Município de Fortaleza",
-                municipio: "Fortaleza",
-                tipo: "Município",
-                qtdAtendida: 500,
-                totMes: 1500,
-                dataEntrega: "2023-10-25"
-            }
-        ];
+        // Dados simulados baseados na estrutura esperada da planilha
+        const indicatorsData = {
+            years: [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+            indicators: [
+                {
+                    name: "Itens Descaracterizados",
+                    type: "operacional",
+                    values: [850, 920, 1050, 980, 1100, 1250, 1400, 1550, 1700],
+                    meta2025: 1700,
+                    regional: [350, 280, 420, 300, 200]
+                },
+                {
+                    name: "Entidades Beneficiadas",
+                    type: "estrategico",
+                    values: [45, 52, 58, 62, 68, 75, 82, 89, 95],
+                    meta2025: 95,
+                    regional: [25, 18, 22, 15, 9]
+                },
+                {
+                    name: "Pessoas Atendidas",
+                    type: "estrategico",
+                    values: [8500, 9200, 10500, 11200, 12400, 13500, 14800, 16300, 18000],
+                    meta2025: 18000,
+                    regional: [4500, 3800, 4200, 2500, 1300]
+                },
+                {
+                    name: "Eficiência Operacional",
+                    type: "operacional",
+                    values: [72, 75, 78, 80, 82, 85, 87, 89, 92],
+                    meta2025: 92,
+                    regional: [88, 85, 90, 82, 78]
+                },
+                {
+                    name: "Redução de Resíduos",
+                    type: "sustentabilidade",
+                    values: [65, 68, 72, 75, 78, 81, 84, 87, 90],
+                    meta2025: 90,
+                    regional: [82, 78, 85, 80, 75]
+                },
+                {
+                    name: "Satisfação dos Beneficiários",
+                    type: "estrategico",
+                    values: [78, 80, 82, 84, 85, 86, 87, 88, 90],
+                    meta2025: 90,
+                    regional: [85, 82, 88, 83, 79]
+                }
+            ],
+            regionais: ["Norte", "Sul", "Leste", "Oeste", "Centro"]
+        };
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
-            aplicarFiltrosRecebedores();
-            carregarDoacoesExemplo();
-            carregarDescaracterizacoesExemplo();
-            
-            // Event listeners para filtros
-            document.getElementById('filtroNome').addEventListener('input', aplicarFiltrosRecebedores);
-            document.getElementById('filtroMunicipio').addEventListener('input', aplicarFiltrosRecebedores);
-            document.getElementById('filtroTipo').addEventListener('change', aplicarFiltrosRecebedores);
-            document.getElementById('filtroData').addEventListener('change', aplicarFiltrosRecebedores);
-            
-            // Event listeners para formulários
-            document.getElementById('formDoacao').addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Doação registrada com sucesso!');
-                this.reset();
-            });
-            
-            document.getElementById('formDescaracterizacao').addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Descaracterização registrada com sucesso!');
-                this.reset();
-            });
+            updateDate();
+            initializeCharts();
+            loadIndicatorsTable();
+            setupEventListeners();
         });
 
-        function aplicarFiltrosRecebedores() {
-            const filtroNome = document.getElementById('filtroNome').value.toLowerCase();
-            const filtroMunicipio = document.getElementById('filtroMunicipio').value.toLowerCase();
-            const filtroTipo = document.getElementById('filtroTipo').value;
-            const filtroData = document.getElementById('filtroData').value;
-            
-            const tabela = document.getElementById('tabelaRecebedores');
-            tabela.innerHTML = '';
-            
-            recebedoresExemplo.forEach(recebedor => {
-                if (filtroNome && !recebedor.nome.toLowerCase().includes(filtroNome)) return;
-                if (filtroMunicipio && !recebedor.municipio.toLowerCase().includes(filtroMunicipio)) return;
-                if (filtroTipo && recebedor.tipo !== filtroTipo) return;
-                if (filtroData && recebedor.dataEntrega !== filtroData) return;
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('pt-BR');
+            document.getElementById('last-update').textContent = 
+                now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+        }
+
+        function initializeCharts() {
+            // Gráfico de Evolução
+            const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
+            new Chart(evolutionCtx, {
+                type: 'line',
+                data: {
+                    labels: indicatorsData.years,
+                    datasets: indicatorsData.indicators.map((indicator, index) => ({
+                        label: indicator.name,
+                        data: indicator.values,
+                        borderColor: getColor(index),
+                        backgroundColor: getColor(index, 0.1),
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolução Histórica dos Principais Indicadores'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valores'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Distribuição
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: indicatorsData.indicators.map(ind => ind.name),
+                    datasets: [{
+                        data: indicatorsData.indicators.map(ind => ind.values[7]), // 2024
+                        backgroundColor: indicatorsData.indicators.map((_, index) => getColor(index, 0.7)),
+                        borderColor: indicatorsData.indicators.map((_, index) => getColor(index)),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição em 2024'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico Regional
+            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(regionalCtx, {
+                type: 'bar',
+                data: {
+                    labels: indicatorsData.regionais,
+                    datasets: [{
+                        label: 'Itens Descaracterizados',
+                        data: indicatorsData.indicators[0].regional,
+                        backgroundColor: getColor(0, 0.7)
+                    }, {
+                        label: 'Entidades Beneficiadas',
+                        data: indicatorsData.indicators[1].regional,
+                        backgroundColor: getColor(1, 0.7)
+                    }, {
+                        label: 'Pessoas Atendidas',
+                        data: indicatorsData.indicators[2].regional,
+                        backgroundColor: getColor(2, 0.7)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Desempenho por Regional - 2024'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false
+                        },
+                        y: {
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadIndicatorsTable() {
+            const table = document.getElementById('indicators-table');
+            table.innerHTML = '';
+
+            indicatorsData.indicators.forEach(indicator => {
+                const currentValue = indicator.values[7]; // 2024
+                const previousValue = indicator.values[6]; // 2023
+                const trend = ((currentValue - previousValue) / previousValue * 100).toFixed(1);
+                const progress2025 = (currentValue / indicator.meta2025 * 100).toFixed(1);
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${recebedor.nome}</td>
-                    <td>${recebedor.municipio}</td>
-                    <td>${recebedor.tipo}</td>
-                    <td>${recebedor.qtdAtendida}</td>
-                    <td>${recebedor.totMes}</td>
-                    <td>${formatarData(recebedor.dataEntrega)}</td>
+                    <td><strong>${indicator.name}</strong></td>
+                    <td><span class="badge bg-secondary">${indicator.type}</span></td>
+                    <td>${indicator.values[4].toLocaleString()}</td>
+                    <td>${indicator.values[5].toLocaleString()}</td>
+                    <td>${indicator.values[6].toLocaleString()}</td>
+                    <td><strong>${indicator.values[7].toLocaleString()}</strong></td>
+                    <td>${indicator.meta2025.toLocaleString()}</td>
+                    <td>
+                        <span class="kpi-badge ${progress2025 >= 100 ? 'kpi-met' : 'kpi-not-met'}">
+                            ${progress2025}%
+                        </span>
+                        <div class="progress">
+                            <div class="progress-bar ${progress2025 >= 100 ? 'bg-success' : 'bg-warning'}" 
+                                 style="width: ${Math.min(progress2025, 100)}%"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="indicator-trend ${trend >= 0 ? 'trend-up' : 'trend-down'}">
+                            <i class="fas fa-arrow-${trend >= 0 ? 'up' : 'down'}"></i> 
+                            ${Math.abs(trend)}%
+                        </span>
+                    </td>
                 `;
-                tabela.appendChild(row);
+                table.appendChild(row);
             });
         }
 
-        function limparFiltros() {
-            document.getElementById('filtroNome').value = '';
-            document.getElementById('filtroMunicipio').value = '';
-            document.getElementById('filtroTipo').value = '';
-            document.getElementById('filtroData').value = '';
-            aplicarFiltrosRecebedores();
+        function setupEventListeners() {
+            // Filtros de ano
+            document.querySelectorAll('.year-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    applyFilters();
+                });
+            });
+
+            // Filtros de tipo e status
+            document.getElementById('indicator-type').addEventListener('change', applyFilters);
+            document.getElementById('goal-status').addEventListener('change', applyFilters);
         }
 
-        function formatarData(data) {
-            if (!data) return '';
-            const [ano, mes, dia] = data.split('-');
-            return `${dia}/${mes}/${ano}`;
+        function applyFilters() {
+            // Esta função aplicaria os filtros na tabela e gráficos
+            // Implementação simplificada para demonstração
+            console.log('Filtros aplicados');
         }
 
-        function carregarDoacoesExemplo() {
-            const doacoes = [
-                { doador: "Empresa ABC", tipo: "Alimentos", quantidade: 50, data: "2023-10-20" },
-                { doador: "João Silva", tipo: "Roupas", quantidade: 30, data: "2023-10-19" },
-                { doador: "Comércio XYZ", tipo: "Eletrônicos", quantidade: 15, data: "2023-10-18" }
+        function getColor(index, alpha = 1) {
+            const colors = [
+                `rgba(76, 175, 80, ${alpha})`,
+                `rgba(33, 150, 243, ${alpha})`,
+                `rgba(156, 39, 176, ${alpha})`,
+                `rgba(255, 152, 0, ${alpha})`,
+                `rgba(0, 188, 212, ${alpha})`,
+                `rgba(103, 58, 183, ${alpha})`
             ];
-            
-            const tabela = document.getElementById('tabelaDoacoes');
-            doacoes.forEach(doacao => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${doacao.doador}</td>
-                    <td>${doacao.tipo}</td>
-                    <td>${doacao.quantidade}</td>
-                    <td>${formatarData(doacao.data)}</td>
-                `;
-                tabela.appendChild(row);
-            });
-        }
-
-        function carregarDescaracterizacoesExemplo() {
-            const descaracterizacoes = [
-                { item: "Móveis Usados", origem: "Doação", metodo: "Reciclagem", data: "2023-10-20" },
-                { item: "Eletrônicos", origem: "Coleta", metodo: "Descarte Adequado", data: "2023-10-19" },
-                { item: "Vestuário", origem: "Doação", metodo: "Reutilização", data: "2023-10-18" }
-            ];
-            
-            const tabela = document.getElementById('tabelaDescaracterizacao');
-            descaracterizacoes.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.item}</td>
-                    <td>${item.origem}</td>
-                    <td>${item.metodo}</td>
-                    <td>${formatarData(item.data)}</td>
-                `;
-                tabela.appendChild(row);
-            });
+            return colors[index % colors.length];
         }
     </script>
 </body>
