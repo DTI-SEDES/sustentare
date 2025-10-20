@@ -302,4 +302,12 @@ def main():
             st.markdown("#### 📊 Estatísticas Descritivas")
             if dataset == "Destinação" and not dest_df.empty:
                 st.write(dest_df['Peso_kg'].describe())
-            elif dataset ==
+            elif dataset == "Doações" and not doacao_df.empty:
+                st.write(doacao_df['Quantidade'].describe())
+    
+    except Exception as e:
+        st.error(f"Erro ao carregar o dashboard: {str(e)}")
+        st.info("⚠️ Verifique se os dados estão corretamente formatados.")
+
+if __name__ == "__main__":
+    main()
