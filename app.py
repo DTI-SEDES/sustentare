@@ -217,4 +217,89 @@ def search_functionality():
                 recebedores_df['Recebedor'].str.contains(termo_busca, case=False, na=False)
             ]
             
-            if not resultados
+            if not resultados.empty:
+                st.success(f"✅ Encontrados {len(resultados)} resultados")
+                
+                # Agrupar por recebedor
+                resumo = resultados.groupby('Recebedor').agg({
+                    'Quantidade': 'sum',
+                    'Ano': 'count'
+                }).reset_index()
+                resumo.columns = ['Recebedor', 'Total Recebido', 'Número de Ocorrências']
+                
+                st.dataframe(
+                    resumo.sort_values('Total Recebido', ascending=False),
+                    use_container_width=True
+                )
+            else:
+                st.warning("❌ Nenhum resultado encontrado")
+
+def main():
+    """Função principal"""
+    try:
+        # Carregar dados e aplicar filtros
+        dest_df, doacao_df, recebedores_df, ano, mes = create_dashboard()
+        
+        # Exibir métricas
+        display_metrics(dest_df, doacao_df, recebedores_df, ano, mes)
+        
+        # Layout em abas
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Visualizações", "🔍 Busca", "📋 Dados"])
+        
+        with tab1:
+            st.markdown('<div class="section-header">📈 Visualizações Principais</div>', unsafe_allow_html=True)
+            create_charts(dest_df, doacao_df, recebedores_df)
+        
+        with tab2:
+            st.markdown('<div class="section-header">📊 Gráficos Detalhados</div>', unsafe_allow_html=True)
+            
+            # Gráfico de pizza - Distribuição por mês
+            if not dest_df.empty:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    dest_agrupado = dest_df.groupby('Mês')['Peso_kg'].sum().reset_index()
+                    fig_pizza = px.pie(
+                        dest_agrupado,
+                        values='Peso_kg',
+                        names='Mês',
+                        title="Distribuição por Mês"
+                    )
+                    st.plotly_chart(fig_pizza, use_container_width=True)
+                
+                with col2:
+                    # Gráfico de doações ao longo do tempo
+                    doacao_agrupado = doacao_df.groupby('Mês')['Quantidade'].sum().reset_index()
+                    if not doacao_agrupado.empty:
+                        fig_doacoes = px.line(
+                            doacao_agrupado,
+                            x='Mês',
+                            y='Quantidade',
+                            title="Evolução das Doações",
+                            markers=True
+                        )
+                        st.plotly_chart(fig_doacoes, use_container_width=True)
+        
+        with tab3:
+            search_functionality()
+        
+        with tab4:
+            st.markdown('<div class="section-header">📋 Dados Brutos</div>', unsafe_allow_html=True)
+            
+            dataset = st.selectbox(
+                "Selecione o conjunto de dados:",
+                ["Destinação", "Doações", "Recebedores"]
+            )
+            
+            if dataset == "Destinação":
+                st.dataframe(dest_df, use_container_width=True)
+            elif dataset == "Doações":
+                st.dataframe(doacao_df, use_container_width=True)
+            else:
+                st.dataframe(recebedores_df, use_container_width=True)
+                
+            # Estatísticas descritivas
+            st.markdown("#### 📊 Estatísticas Descritivas")
+            if dataset == "Destinação" and not dest_df.empty:
+                st.write(dest_df['Peso_kg'].describe())
+            elif dataset ==
