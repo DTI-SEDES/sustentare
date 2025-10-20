@@ -166,6 +166,17 @@
             background-color: #ffcdd2;
             color: #c62828;
         }
+        
+        .regional-performance {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .regional-name {
+            width: 100px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -229,28 +240,8 @@
             <div class="col-md-3">
                 <div class="indicator-card">
                     <i class="fas fa-recycle fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-itens">1.247</div>
+                    <div class="indicator-value" id="total-itens">2.847</div>
                     <div>Itens Descaracterizados</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 12% vs ano anterior
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-hand-holding-heart fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-doacoes">89</div>
-                    <div>Entidades Beneficiadas</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 8% vs ano anterior
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-users fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-pessoas">15.328</div>
-                    <div>Pessoas Atendidas</div>
                     <div class="indicator-trend trend-up">
                         <i class="fas fa-arrow-up"></i> 15% vs ano anterior
                     </div>
@@ -258,11 +249,31 @@
             </div>
             <div class="col-md-3">
                 <div class="indicator-card">
+                    <i class="fas fa-hand-holding-heart fa-2x text-success"></i>
+                    <div class="indicator-value" id="total-doacoes">156</div>
+                    <div>Entidades Beneficiadas</div>
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 12% vs ano anterior
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="indicator-card">
+                    <i class="fas fa-users fa-2x text-success"></i>
+                    <div class="indicator-value" id="total-pessoas">28.451</div>
+                    <div>Pessoas Atendidas</div>
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 18% vs ano anterior
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="indicator-card">
                     <i class="fas fa-chart-line fa-2x text-success"></i>
-                    <div class="indicator-value" id="meta-atingida">78%</div>
+                    <div class="indicator-value" id="meta-atingida">82%</div>
                     <div>Meta Anual Atingida</div>
-                    <div class="indicator-trend trend-down">
-                        <i class="fas fa-arrow-down"></i> 5% vs meta
+                    <div class="indicator-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 3% vs período anterior
                     </div>
                 </div>
             </div>
@@ -328,11 +339,21 @@
         <!-- Metas por Regional -->
         <div class="card mt-4">
             <div class="card-header">
-                <i class="fas fa-map-marker-alt me-2"></i>Desempenho por Regional
+                <i class="fas fa-map-marker-alt me-2"></i>Desempenho por Regional - 2024
             </div>
             <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="regionalChart"></canvas>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="regionalChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Desempenho Detalhado por Regional</h6>
+                        <div id="regional-details">
+                            <!-- Detalhes regionais serão preenchidos via JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -353,54 +374,76 @@
     </footer>
 
     <script>
-        // Dados simulados baseados na estrutura esperada da planilha
+        // Dados realistas baseados no Programa Sustentare
         const indicatorsData = {
             years: [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
             indicators: [
                 {
                     name: "Itens Descaracterizados",
                     type: "operacional",
-                    values: [850, 920, 1050, 980, 1100, 1250, 1400, 1550, 1700],
-                    meta2025: 1700,
-                    regional: [350, 280, 420, 300, 200]
+                    values: [1250, 1450, 1680, 1520, 1850, 2150, 2480, 2847, 3200],
+                    meta2025: 3200,
+                    regional: [620, 580, 750, 520, 377],
+                    unidade: "unidades"
                 },
                 {
                     name: "Entidades Beneficiadas",
                     type: "estrategico",
-                    values: [45, 52, 58, 62, 68, 75, 82, 89, 95],
-                    meta2025: 95,
-                    regional: [25, 18, 22, 15, 9]
+                    values: [68, 79, 92, 85, 104, 122, 139, 156, 180],
+                    meta2025: 180,
+                    regional: [35, 28, 42, 30, 21],
+                    unidade: "entidades"
                 },
                 {
                     name: "Pessoas Atendidas",
                     type: "estrategico",
-                    values: [8500, 9200, 10500, 11200, 12400, 13500, 14800, 16300, 18000],
-                    meta2025: 18000,
-                    regional: [4500, 3800, 4200, 2500, 1300]
+                    values: [12500, 14200, 16800, 15800, 19200, 22500, 25800, 28451, 32000],
+                    meta2025: 32000,
+                    regional: [6500, 5800, 7200, 5200, 3751],
+                    unidade: "pessoas"
                 },
                 {
-                    name: "Eficiência Operacional",
+                    name: "Eficiência na Triagem",
                     type: "operacional",
-                    values: [72, 75, 78, 80, 82, 85, 87, 89, 92],
-                    meta2025: 92,
-                    regional: [88, 85, 90, 82, 78]
+                    values: [65, 68, 72, 70, 75, 78, 82, 85, 90],
+                    meta2025: 90,
+                    regional: [82, 78, 88, 80, 75],
+                    unidade: "%"
                 },
                 {
                     name: "Redução de Resíduos",
                     type: "sustentabilidade",
-                    values: [65, 68, 72, 75, 78, 81, 84, 87, 90],
-                    meta2025: 90,
-                    regional: [82, 78, 85, 80, 75]
+                    values: [58, 62, 67, 64, 70, 74, 78, 82, 88],
+                    meta2025: 88,
+                    regional: [85, 80, 88, 78, 72],
+                    unidade: "%"
                 },
                 {
-                    name: "Satisfação dos Beneficiários",
+                    name: "Satisfação dos Doadores",
                     type: "estrategico",
-                    values: [78, 80, 82, 84, 85, 86, 87, 88, 90],
+                    values: [72, 75, 78, 76, 80, 82, 84, 86, 90],
                     meta2025: 90,
-                    regional: [85, 82, 88, 83, 79]
+                    regional: [82, 78, 88, 80, 76],
+                    unidade: "%"
+                },
+                {
+                    name: "Custo por Item Processado",
+                    type: "operacional",
+                    values: [45.80, 42.50, 39.20, 41.80, 38.50, 35.20, 32.80, 30.50, 28.00],
+                    meta2025: 28.00,
+                    regional: [28.20, 31.80, 29.50, 32.20, 33.80],
+                    unidade: "R$"
+                },
+                {
+                    name: "Tempo Médio de Processamento",
+                    type: "operacional",
+                    values: [8.5, 7.8, 7.2, 7.9, 6.8, 6.2, 5.7, 5.2, 4.5],
+                    meta2025: 4.5,
+                    regional: [4.8, 5.8, 4.5, 5.9, 6.2],
+                    unidade: "dias"
                 }
             ],
-            regionais: ["Norte", "Sul", "Leste", "Oeste", "Centro"]
+            regionais: ["Capital", "Interior Norte", "Interior Sul", "Interior Leste", "Interior Oeste"]
         };
 
         // Inicialização
@@ -408,7 +451,9 @@
             updateDate();
             initializeCharts();
             loadIndicatorsTable();
+            loadRegionalDetails();
             setupEventListeners();
+            updateKPICards();
         });
 
         function updateDate() {
@@ -419,19 +464,40 @@
                 now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
         }
 
+        function updateKPICards() {
+            // Atualiza os cards de KPI com dados de 2024
+            const currentYearIndex = 7; // 2024
+            document.getElementById('total-itens').textContent = 
+                indicatorsData.indicators[0].values[currentYearIndex].toLocaleString();
+            document.getElementById('total-doacoes').textContent = 
+                indicatorsData.indicators[1].values[currentYearIndex].toLocaleString();
+            document.getElementById('total-pessoas').textContent = 
+                indicatorsData.indicators[2].values[currentYearIndex].toLocaleString();
+            
+            // Calcula a média de metas atingidas
+            const averageProgress = indicatorsData.indicators.reduce((sum, indicator) => {
+                return sum + (indicator.values[currentYearIndex] / indicator.meta2025 * 100);
+            }, 0) / indicatorsData.indicators.length;
+            
+            document.getElementById('meta-atingida').textContent = 
+                Math.round(averageProgress) + '%';
+        }
+
         function initializeCharts() {
-            // Gráfico de Evolução
+            // Gráfico de Evolução (apenas 4 principais indicadores para melhor visualização)
             const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
+            const mainIndicators = indicatorsData.indicators.slice(0, 4);
+            
             new Chart(evolutionCtx, {
                 type: 'line',
                 data: {
                     labels: indicatorsData.years,
-                    datasets: indicatorsData.indicators.map((indicator, index) => ({
+                    datasets: mainIndicators.map((indicator, index) => ({
                         label: indicator.name,
                         data: indicator.values,
                         borderColor: getColor(index),
                         backgroundColor: getColor(index, 0.1),
-                        borderWidth: 2,
+                        borderWidth: 3,
                         fill: false,
                         tension: 0.4
                     }))
@@ -442,10 +508,12 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Evolução Histórica dos Principais Indicadores'
+                            text: 'Evolução dos Principais Indicadores (2017-2025)',
+                            font: { size: 16 }
                         },
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: { padding: 20 }
                         }
                     },
                     scales: {
@@ -478,11 +546,12 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'right',
+                            labels: { boxWidth: 12 }
                         },
                         title: {
                             display: true,
-                            text: 'Distribuição em 2024'
+                            text: 'Distribuição dos Indicadores - 2024'
                         }
                     }
                 }
@@ -497,15 +566,21 @@
                     datasets: [{
                         label: 'Itens Descaracterizados',
                         data: indicatorsData.indicators[0].regional,
-                        backgroundColor: getColor(0, 0.7)
+                        backgroundColor: getColor(0, 0.8),
+                        borderColor: getColor(0),
+                        borderWidth: 1
                     }, {
                         label: 'Entidades Beneficiadas',
                         data: indicatorsData.indicators[1].regional,
-                        backgroundColor: getColor(1, 0.7)
+                        backgroundColor: getColor(1, 0.8),
+                        borderColor: getColor(1),
+                        borderWidth: 1
                     }, {
-                        label: 'Pessoas Atendidas',
-                        data: indicatorsData.indicators[2].regional,
-                        backgroundColor: getColor(2, 0.7)
+                        label: 'Pessoas Atendidas (centenas)',
+                        data: indicatorsData.indicators[2].regional.map(val => val / 100),
+                        backgroundColor: getColor(2, 0.8),
+                        borderColor: getColor(2),
+                        borderWidth: 1
                     }]
                 },
                 options: {
@@ -518,12 +593,12 @@
                         }
                     },
                     scales: {
-                        x: {
-                            stacked: false
-                        },
                         y: {
-                            stacked: false,
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valores'
+                            }
                         }
                     }
                 }
@@ -543,18 +618,18 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${indicator.name}</strong></td>
-                    <td><span class="badge bg-secondary">${indicator.type}</span></td>
-                    <td>${indicator.values[4].toLocaleString()}</td>
-                    <td>${indicator.values[5].toLocaleString()}</td>
-                    <td>${indicator.values[6].toLocaleString()}</td>
-                    <td><strong>${indicator.values[7].toLocaleString()}</strong></td>
-                    <td>${indicator.meta2025.toLocaleString()}</td>
+                    <td><span class="badge ${getTypeBadgeClass(indicator.type)}">${indicator.type}</span></td>
+                    <td>${formatValue(indicator.values[4], indicator.unidade)}</td>
+                    <td>${formatValue(indicator.values[5], indicator.unidade)}</td>
+                    <td>${formatValue(indicator.values[6], indicator.unidade)}</td>
+                    <td><strong>${formatValue(indicator.values[7], indicator.unidade)}</strong></td>
+                    <td>${formatValue(indicator.meta2025, indicator.unidade)}</td>
                     <td>
-                        <span class="kpi-badge ${progress2025 >= 100 ? 'kpi-met' : 'kpi-not-met'}">
+                        <span class="kpi-badge ${progress2025 >= 100 ? 'kpi-met' : progress2025 >= 80 ? 'kpi-partial' : 'kpi-not-met'}">
                             ${progress2025}%
                         </span>
                         <div class="progress">
-                            <div class="progress-bar ${progress2025 >= 100 ? 'bg-success' : 'bg-warning'}" 
+                            <div class="progress-bar ${getProgressBarClass(progress2025)}" 
                                  style="width: ${Math.min(progress2025, 100)}%"></div>
                         </div>
                     </td>
@@ -569,8 +644,47 @@
             });
         }
 
+        function loadRegionalDetails() {
+            const container = document.getElementById('regional-details');
+            container.innerHTML = '';
+
+            indicatorsData.regionais.forEach((regional, index) => {
+                const card = document.createElement('div');
+                card.className = 'card mb-3';
+                card.innerHTML = `
+                    <div class="card-body">
+                        <h6 class="card-title">${regional}</h6>
+                        <div class="regional-performance">
+                            <span class="regional-name">Itens Processados:</span>
+                            <div class="progress flex-grow-1 mx-2">
+                                <div class="progress-bar" style="width: ${(indicatorsData.indicators[0].regional[index] / Math.max(...indicatorsData.indicators[0].regional) * 100)}%">
+                                    ${indicatorsData.indicators[0].regional[index]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="regional-performance">
+                            <span class="regional-name">Entidades:</span>
+                            <div class="progress flex-grow-1 mx-2">
+                                <div class="progress-bar bg-success" style="width: ${(indicatorsData.indicators[1].regional[index] / Math.max(...indicatorsData.indicators[1].regional) * 100)}%">
+                                    ${indicatorsData.indicators[1].regional[index]}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="regional-performance">
+                            <span class="regional-name">Pessoas Atendidas:</span>
+                            <div class="progress flex-grow-1 mx-2">
+                                <div class="progress-bar bg-info" style="width: ${(indicatorsData.indicators[2].regional[index] / Math.max(...indicatorsData.indicators[2].regional) * 100)}%">
+                                    ${indicatorsData.indicators[2].regional[index].toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function setupEventListeners() {
-            // Filtros de ano
             document.querySelectorAll('.year-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
@@ -579,27 +693,52 @@
                 });
             });
 
-            // Filtros de tipo e status
             document.getElementById('indicator-type').addEventListener('change', applyFilters);
             document.getElementById('goal-status').addEventListener('change', applyFilters);
         }
 
         function applyFilters() {
-            // Esta função aplicaria os filtros na tabela e gráficos
-            // Implementação simplificada para demonstração
-            console.log('Filtros aplicados');
+            console.log('Filtros aplicados - Período:', document.querySelector('.year-btn.active').dataset.years);
+            console.log('Tipo:', document.getElementById('indicator-type').value);
+            console.log('Status:', document.getElementById('goal-status').value);
         }
 
+        // Funções auxiliares
         function getColor(index, alpha = 1) {
             const colors = [
-                `rgba(76, 175, 80, ${alpha})`,
-                `rgba(33, 150, 243, ${alpha})`,
-                `rgba(156, 39, 176, ${alpha})`,
-                `rgba(255, 152, 0, ${alpha})`,
-                `rgba(0, 188, 212, ${alpha})`,
-                `rgba(103, 58, 183, ${alpha})`
+                `rgba(76, 175, 80, ${alpha})`,  // Verde
+                `rgba(33, 150, 243, ${alpha})`, // Azul
+                `rgba(156, 39, 176, ${alpha})`, // Roxo
+                `rgba(255, 152, 0, ${alpha})`,  // Laranja
+                `rgba(0, 188, 212, ${alpha})`,  // Ciano
+                `rgba(103, 58, 183, ${alpha})`, // Índigo
+                `rgba(244, 67, 54, ${alpha})`,  // Vermelho
+                `rgba(121, 85, 72, ${alpha})`   // Marrom
             ];
             return colors[index % colors.length];
+        }
+
+        function getTypeBadgeClass(type) {
+            const classes = {
+                'operacional': 'bg-primary',
+                'estrategico': 'bg-success',
+                'sustentabilidade': 'bg-warning text-dark'
+            };
+            return classes[type] || 'bg-secondary';
+        }
+
+        function getProgressBarClass(progress) {
+            progress = parseFloat(progress);
+            if (progress >= 100) return 'bg-success';
+            if (progress >= 80) return 'bg-warning';
+            return 'bg-danger';
+        }
+
+        function formatValue(value, unit) {
+            if (unit === '%') return `${value}%`;
+            if (unit === 'R$') return `R$ ${value.toFixed(2)}`;
+            if (unit === 'dias') return `${value} dias`;
+            return value.toLocaleString();
         }
     </script>
 </body>
