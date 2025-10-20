@@ -10,7 +10,7 @@ Sistema de monitoramento e análise dos indicadores de sustentabilidade, incluin
 - Métricas ambientais
 - Relatórios periódicos
 
-## 🚀 Como Executar
+## 🚀 Acesse o APP: #https://sustentare-dados.streamlit.app/#
 
 ### Pré-requisitos
 - Python 3.8+
