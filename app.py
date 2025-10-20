@@ -125,11 +125,90 @@ class DataProcessor:
         
         return df
 
+@st.cache_data
+def load_sample_data():
+    """Carrega dados de exemplo para demonstração"""
+    # Dados de destinação (2017-2025)
+    dest_data = {
+        'Ano': [2023, 2023, 2023, 2023, 2024, 2024, 2024, 2024],
+        'Mês': ['JAN', 'FEV', 'MAR', 'ABR', 'JAN', 'FEV', 'MAR', 'ABR'],
+        'Peso_kg': [24488, 5615, 32052, 10205, 17913, 11009, 12368, 15410]
+    }
+    
+    # Dados de doações
+    doacao_data = {
+        'Ano': [2023, 2023, 2023, 2023, 2024, 2024, 2024, 2024],
+        'Mês': ['JAN', 'FEV', 'MAR', 'ABR', 'JAN', 'FEV', 'MAR', 'ABR'],
+        'Quantidade': [120, 42, 49, 47, 91, 174, 115, 123]
+    }
+    
+    # Dados de recebedores
+    recebedores_data = {
+        'Ano': [2023, 2023, 2023, 2024, 2024, 2024],
+        'Recebedor': [
+            'Secretaria Municipal de Educação de Porto Alegre',
+            'Corpo de Bombeiros Militar do RS', 
+            'Hospital Beneficência Alto Jacuí',
+            'Prefeitura de Porto Alegre',
+            'Secretaria Estadual da Educação',
+            'Fundação O Pão dos Pobres'
+        ],
+        'Quantidade': [15, 30, 25, 20, 35, 28]
+    }
+    
+    dest_df = pd.DataFrame(dest_data)
+    doacao_df = pd.DataFrame(doacao_data)
+    recebedores_df = pd.DataFrame(recebedores_data)
+    
+    return dest_df, doacao_df, recebedores_df
+
+def create_template_file():
+    """Cria um template Excel para download"""
+    
+    # Dados de exemplo para o template
+    template_dest = pd.DataFrame({
+        'Ano': [2024, 2024, 2024],
+        'Mês': ['JAN', 'FEV', 'MAR'],
+        'Peso_kg': [1000, 1500, 1200]
+    })
+    
+    template_doacao = pd.DataFrame({
+        'Ano': [2024, 2024, 2024],
+        'Mês': ['JAN', 'FEV', 'MAR'],
+        'Quantidade': [50, 75, 60]
+    })
+    
+    template_recebedores = pd.DataFrame({
+        'Ano': [2024, 2024, 2024],
+        'Recebedor': ['Entidade A', 'Entidade B', 'Entidade C'],
+        'Quantidade': [25, 30, 20]
+    })
+    
+    # Criar arquivo Excel em memória
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        template_dest.to_excel(writer, sheet_name='destinacao', index=False)
+        template_doacao.to_excel(writer, sheet_name='doacao', index=False)
+        template_recebedores.to_excel(writer, sheet_name='recebedores', index=False)
+    
+    output.seek(0)
+    return output
+
 def setup_data_upload():
     """Configura a interface de upload de dados"""
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 📤 Upload de Dados")
+    
+    # Template download
+    template = create_template_file()
+    st.sidebar.download_button(
+        label="📥 Baixar Template",
+        data=template,
+        file_name="template_sustentare.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        help="Baixe o template para preencher com seus dados"
+    )
     
     # Modo de operação
     modo = st.sidebar.radio(
@@ -246,13 +325,6 @@ def handle_file_upload():
     
     return None, None, None
 
-@st.cache_data
-def load_sample_data():
-    """Carrega dados de exemplo para demonstração"""
-    # Seus dados de exemplo originais aqui...
-    # (mantenha os dados que você já tinha)
-    return dest_df, doacao_df, recebedores_df
-
 def create_dashboard(dest_df, doacao_df, recebedores_df):
     """Cria o dashboard principal"""
     
@@ -338,58 +410,58 @@ def display_metrics(dest_df, doacao_df, recebedores_df, ano, mes, data_source):
                 delta=None
             )
 
-# ... (mantenha as outras funções create_charts, search_functionality, etc.)
-
-def main():
-    """Função principal"""
+def create_charts(dest_df, doacao_df, recebedores_df):
+    """Cria visualizações gráficas"""
     
-    # Configurar upload de dados
-    data_mode = setup_data_upload()
+    # Gráfico 1: Evolução mensal do peso destinado
+    st.markdown('<div class="section-header">📈 Evolução Mensal - Peso Destinado</div>', unsafe_allow_html=True)
     
-    if data_mode == "exemplo":
-        # Usar dados de exemplo
-        dest_df, doacao_df, recebedores_df = load_sample_data()
-        data_source = "exemplo"
-    else:
-        # Upload de dados
-        dest_df, doacao_df, recebedores_df = handle_file_upload()
-        data_source = "upload"
+    if not dest_df.empty:
+        # Ordem correta dos meses
+        ordem_meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+        dest_df['Mês'] = pd.Categorical(dest_df['Mês'], categories=ordem_meses, ordered=True)
+        dest_agrupado = dest_df.groupby('Mês')['Peso_kg'].sum().reset_index()
         
-        # Se não há dados carregados, mostrar instruções
-        if dest_df is None and doacao_df is None and recebedores_df is None:
-            st.info("📝 Faça upload de um arquivo Excel para visualizar os dados")
-            return
-    
-    # Verificar se temos dados para mostrar
-    if (dest_df is not None and not dest_df.empty) or (doacao_df is not None and not doacao_df.empty):
-        
-        # Criar dashboard com os dados
-        dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes = create_dashboard(
-            dest_df, doacao_df, recebedores_df
+        fig1 = px.bar(
+            dest_agrupado, 
+            x='Mês', 
+            y='Peso_kg',
+            title=f"Peso Total Destinado por Mês",
+            color='Peso_kg',
+            color_continuous_scale='Viridis'
         )
-        
-        # Exibir métricas
-        display_metrics(dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes, data_source)
-        
-        # Layout em abas (mantenha o restante do seu código existente)
-        tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Visualizações", "🔍 Busca", "📋 Dados"])
-        
-        with tab1:
-            st.markdown('<div class="section-header">📈 Visualizações Principais</div>', unsafe_allow_html=True)
-            create_charts(dest_filtrado, doacao_filtrado, recebedores_filtrado)
-        
-        with tab2:
-            # ... (código existente)
-            pass
-        
-        with tab3:
-            search_functionality(recebedores_df)
-        
-        with tab4:
-            show_raw_data(dest_df, doacao_df, recebedores_df, data_source)
-    
+        fig1.update_layout(
+            xaxis_title="Mês",
+            yaxis_title="Peso (kg)",
+            showlegend=False
+        )
+        st.plotly_chart(fig1, use_container_width=True)
     else:
-        st.warning("⚠️ Nenhum dado disponível para visualização. Use dados de exemplo ou faça upload de uma planilha.")
+        st.info("📊 Nenhum dado de destinação disponível para gráfico")
+    
+    # Gráfico 2: Top recebedores
+    st.markdown('<div class="section-header">🏆 Top Recebedores</div>', unsafe_allow_html=True)
+    
+    if not recebedores_df.empty:
+        top_recebedores = recebedores_df.groupby('Recebedor')['Quantidade'].sum().nlargest(10).reset_index()
+        
+        fig2 = px.bar(
+            top_recebedores,
+            x='Quantidade',
+            y='Recebedor',
+            orientation='h',
+            title="Top 10 Recebedores por Quantidade",
+            color='Quantidade',
+            color_continuous_scale='Blues'
+        )
+        fig2.update_layout(
+            yaxis={'categoryorder':'total ascending'},
+            xaxis_title="Quantidade Recebida",
+            yaxis_title=""
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+    else:
+        st.info("📊 Nenhum dado de recebedores disponível para gráfico")
 
 def search_functionality(recebedores_df):
     """Funcionalidade de busca"""
@@ -466,7 +538,89 @@ def show_raw_data(dest_df, doacao_df, recebedores_df, data_source):
     else:
         st.info("ℹ️ Nenhum dado disponível para o conjunto selecionado")
 
-# ... (mantenha as funções create_charts e load_sample_data do código anterior)
+def main():
+    """Função principal"""
+    
+    # Configurar upload de dados
+    data_mode = setup_data_upload()
+    
+    if data_mode == "exemplo":
+        # Usar dados de exemplo
+        dest_df, doacao_df, recebedores_df = load_sample_data()
+        data_source = "exemplo"
+    else:
+        # Upload de dados
+        dest_df, doacao_df, recebedores_df = handle_file_upload()
+        data_source = "upload"
+        
+        # Se não há dados carregados, mostrar instruções
+        if dest_df is None and doacao_df is None and recebedores_df is None:
+            st.info("📝 Faça upload de um arquivo Excel para visualizar os dados")
+            return
+    
+    # Verificar se temos dados para mostrar
+    if (dest_df is not None and not dest_df.empty) or (doacao_df is not None and not doacao_df.empty):
+        
+        # Criar dashboard com os dados
+        dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes = create_dashboard(
+            dest_df, doacao_df, recebedores_df
+        )
+        
+        # Exibir métricas
+        display_metrics(dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes, data_source)
+        
+        # Layout em abas
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Visualizações", "🔍 Busca", "📋 Dados"])
+        
+        with tab1:
+            st.markdown('<div class="section-header">📈 Visualizações Principais</div>', unsafe_allow_html=True)
+            create_charts(dest_filtrado, doacao_filtrado, recebedores_filtrado)
+        
+        with tab2:
+            st.markdown('<div class="section-header">📊 Gráficos Detalhados</div>', unsafe_allow_html=True)
+            
+            # Gráfico de pizza - Distribuição por mês
+            if not dest_filtrado.empty:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    dest_agrupado = dest_filtrado.groupby('Mês')['Peso_kg'].sum().reset_index()
+                    fig_pizza = px.pie(
+                        dest_agrupado,
+                        values='Peso_kg',
+                        names='Mês',
+                        title="Distribuição por Mês"
+                    )
+                    st.plotly_chart(fig_pizza, use_container_width=True)
+                
+                with col2:
+                    # Gráfico de doações ao longo do tempo
+                    if not doacao_filtrado.empty:
+                        doacao_agrupado = doacao_filtrado.groupby('Mês')['Quantidade'].sum().reset_index()
+                        if not doacao_agrupado.empty:
+                            fig_doacoes = px.line(
+                                doacao_agrupado,
+                                x='Mês',
+                                y='Quantidade',
+                                title="Evolução das Doações",
+                                markers=True
+                            )
+                            st.plotly_chart(fig_doacoes, use_container_width=True)
+                        else:
+                            st.info("📊 Nenhum dado de doações disponível para gráfico")
+                    else:
+                        st.info("📊 Nenhum dado de doações disponível para gráfico")
+            else:
+                st.info("📊 Nenhum dado disponível para visualizações detalhadas")
+        
+        with tab3:
+            search_functionality(recebedores_filtrado)
+        
+        with tab4:
+            show_raw_data(dest_df, doacao_df, recebedores_df, data_source)
+    
+    else:
+        st.warning("⚠️ Nenhum dado disponível para visualização. Use dados de exemplo ou faça upload de uma planilha.")
 
 if __name__ == "__main__":
     main()
