@@ -611,4 +611,42 @@
                     this.classList.add('active');
                     
                     const region = this.getAttribute('data-region');
-                    filterBy
+                    filterByRegion(region);
+                });
+            });
+        }
+
+        function filterByRegion(region) {
+            const tableRows = document.querySelectorAll('#cities-table tr');
+            const markers = document.querySelectorAll('.city-marker');
+            
+            if (region === 'all') {
+                // Mostra todas as cidades
+                tableRows.forEach(row => row.style.display = '');
+                markers.forEach(marker => marker.style.display = 'block');
+            } else {
+                // Filtra por região
+                tableRows.forEach(row => {
+                    const cityName = row.cells[0].textContent;
+                    const city = citiesData.find(c => c.name === cityName);
+                    if (city && city.region === region) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                markers.forEach(marker => {
+                    const cityName = marker.getAttribute('data-city');
+                    const city = citiesData.find(c => c.name === cityName);
+                    if (city && city.region === region) {
+                        marker.style.display = 'block';
+                    } else {
+                        marker.style.display = 'none';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
