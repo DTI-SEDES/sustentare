@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Administração</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h2>Administração</h2></header>
+<button onclick="document.getElementById('file').click()">Importar Planilha</button>
+<input type="file" id="file" accept=".xls,.xlsx,.csv" hidden onchange="importar()" />
+<form onsubmit="incluir(event)">
+  <input required placeholder="Recebedor"><input required placeholder="Município"><input required placeholder="Tipo">
+  <input required placeholder="Qtd" type="number"><input required placeholder="Total Mês"><input required placeholder="Data">
+  <button>Incluir</button>
+</form>
+<script src="admin.js"></script>
+</body>
+</html>
