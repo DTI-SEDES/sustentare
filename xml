@@ -1,0 +1,8 @@
+<!DOCTYPE h
+l>
+
+tml l
+
+ng="pt-br">
+
+<head> <meta charset="UTF-8"> <title>Sustentare</title> <link rel="stylesheet" href="style.css"> </head> <body> <header><h1>Sustentare - Doações</h1></header> <nav> <a href="doacoes.html">Doações</a> <a href="recebedores.html">Recebedores</a> <a href="descaracterizacao.html">Descaracterização</a> <a href="projeto-piloto.html">Projeto Piloto MPSustentare</a> <a href="login.html">Admin</a> </nav> <main> <p>Bem-vindo ao Sistema Sustentare. Utilize o menu acima.</p> </main> </body> </html> ```
