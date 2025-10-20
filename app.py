@@ -2,13 +2,11 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime
-import io
 
 # Configuração da página
 st.set_page_config(
-    page_title="Sustentare",
+    page_title="Sustentare - DTI/SEDES",
     page_icon="♻️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -84,7 +82,7 @@ def load_sample_data():
                        58, 106, 39, 51, 93, 84, 70, 60, 107, 15, 
                        74, 25, 55, 120, 42, 49, 47, 70, 99, 154, 
                        408, 136, 51, 91, 174, 115, 123, 95, 124, 50,
-                       50, 50, 50, 50, 50, 50, 50, 50, 50, 50]  # Valores fictícios para completar
+                       50, 50, 50, 50, 50, 50, 50, 50, 50, 50]
     }
     
     df_dest = pd.DataFrame(dest_data)
@@ -98,26 +96,6 @@ def load_sample_data():
     df_doacao['Mes_num'] = df_doacao['Mês'].map(meses_pt)
     
     return df_dest, df_doacao
-
-def main():
-    # Cabeçalho
-    st.markdown('<h1 class="main-header">♻️ Programa Sustentare - DTI/SEDES</h1>', unsafe_allow_html=True)
-    
-    # Sidebar
-    st.sidebar.title("Navegação")
-    aba_selecionada = st.sidebar.radio("Selecione a aba:", ["🏠 Início", "📊 Dados Destinação", "🎁 Itens Doados", "ℹ️ Sobre"])
-    
-    # Carregar dados
-    df_dest, df_doacao = load_sample_data()
-    
-    if "🏠 Início" in aba_selecionada:
-        show_home(df_dest, df_doacao)
-    elif "📊 Dados Destinação" in aba_selecionada:
-        show_destinacao(df_dest)
-    elif "🎁 Itens Doados" in aba_selecionada:
-        show_doacoes(df_doacao)
-    elif "ℹ️ Sobre" in aba_selecionada:
-        show_sobre()
 
 def show_home(df_dest, df_doacao):
     st.markdown('<h2 class="section-header">📈 Dashboard Resumido</h2>', unsafe_allow_html=True)
@@ -224,8 +202,15 @@ def show_destinacao(df_dest):
         fig = px.bar(dest_mes, x='Mês', y='Peso_kg', title=f"Destinação em {ano_selecionado}")
         st.plotly_chart(fig, use_container_width=True)
     
-    # Tabela
+    # Tabela - CORREÇÃO: Ordenar apenas por 'Ano' ou recriar 'Mes_num' se necessário
     st.subheader("📋 Dados Detalhados")
+    
+    # Garantir que Mes_num existe no DataFrame filtrado
+    if 'Mes_num' not in df_filtrado.columns:
+        meses_pt = {'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6, 
+                    'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12}
+        df_filtrado['Mes_num'] = df_filtrado['Mês'].map(meses_pt)
+    
     df_tabela = df_filtrado[['Ano', 'Mês', 'Peso_kg']].sort_values(['Ano', 'Mes_num'])
     st.dataframe(df_tabela, use_container_width=True)
 
@@ -270,8 +255,15 @@ def show_doacoes(df_doacao):
         fig = px.bar(doacao_mes, x='Mês', y='Quantidade', title=f"Doações em {ano_selecionado}")
         st.plotly_chart(fig, use_container_width=True)
     
-    # Tabela
+    # Tabela - CORREÇÃO: Garantir que Mes_num existe
     st.subheader("📋 Dados Detalhados")
+    
+    # Garantir que Mes_num existe no DataFrame filtrado
+    if 'Mes_num' not in df_filtrado.columns:
+        meses_pt = {'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6, 
+                    'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12}
+        df_filtrado['Mes_num'] = df_filtrado['Mês'].map(meses_pt)
+    
     df_tabela = df_filtrado[['Ano', 'Mês', 'Quantidade']].sort_values(['Ano', 'Mes_num'])
     st.dataframe(df_tabela, use_container_width=True)
 
@@ -281,13 +273,13 @@ def show_sobre():
     st.markdown("""
     ## 🏛️ Sobre o Programa
     
-    O **Programa Sustentare** é uma iniciativa do **Governo do Estado** para promover a sustentabilidade 
+    O **Programa Sustentare** é uma iniciativa da **DTI/SEDES** para promover a sustentabilidade 
     através da destinação adequada de resíduos e doação de equipamentos.
     
     ## 🎯 Objetivos
     
     - **Destinação ambientalmente adequada** de resíduos eletrônicos
-    - **Recondicionamento e doação** de equipamentos eletônicos
+    - **Recondicionamento e doação** de equipamentos de informática
     - **Inclusão digital** através de equipamentos reutilizados
     - **Redução do impacto ambiental** do descarte inadequado
     
@@ -295,18 +287,43 @@ def show_sobre():
     
     1. **Coleta** - Recebimento de equipamentos e materiais
     2. **Triagem** - Avaliação e classificação dos itens
-    3. **Recondicionamento** - Reparo e preparação de computadores para uso
-    4. **Destinação** - Doação ou reciclagem adequada para entidades cadastradas.
+    3. **Recondicionamento** - Reparo e preparação para uso
+    4. **Destinação** - Doação ou reciclagem adequada
     
     ## 👥 Equipe
     
-    - **Programa Sustentare** - Coordenação do Programa - Secretaria de Desenvolvimento Social
+    - **DTI** - Departamento de Tecnologia da Informação
+    - **SEDES** - Secretaria de Desenvolvimento Social
     
     ## 📞 Contato
-    Coordenador: Dionatan Aristimunha
-    coordenacao-sustentare@social.rs.gov.br
+    
     Para mais informações: **sustentare@procergs.rs.gov.br**
     """)
+
+def main():
+    # Cabeçalho
+    st.markdown('<h1 class="main-header">♻️ Programa Sustentare - RS.GOV.BR</h1>', unsafe_allow_html=True)
+    
+    # Sidebar
+    st.sidebar.title("Navegação")
+    aba_selecionada = st.sidebar.radio("Selecione a aba:", ["🏠 Início", "📊 Dados Destinação", "🎁 Itens Doados", "ℹ️ Sobre"])
+    
+    try:
+        # Carregar dados
+        df_dest, df_doacao = load_sample_data()
+        
+        if "🏠 Início" in aba_selecionada:
+            show_home(df_dest, df_doacao)
+        elif "📊 Dados Destinação" in aba_selecionada:
+            show_destinacao(df_dest)
+        elif "🎁 Itens Doados" in aba_selecionada:
+            show_doacoes(df_doacao)
+        elif "ℹ️ Sobre" in aba_selecionada:
+            show_sobre()
+            
+    except Exception as e:
+        st.error(f"Erro ao carregar o aplicativo: {str(e)}")
+        st.info("Por favor, recarregue a página ou tente novamente mais tarde.")
 
 if __name__ == "__main__":
     main()
