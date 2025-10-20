@@ -650,3 +650,1154 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa Sustentare - Sistema de Monitoramento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --verde-primario: #2E7D32;
+            --verde-secundario: #4CAF50;
+            --verde-claro: #C8E6C9;
+            --verde-escuro: #1B5E20;
+            --branco: #FFFFFF;
+            --cinza-claro: #F5F5F5;
+        }
+        
+        body {
+            background-color: var(--cinza-claro);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-secundario));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .logo-container {
+            background-color: var(--branco);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            color: var(--verde-primario);
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--verde-escuro);
+            font-weight: 500;
+            border: none;
+            padding: 15px 25px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: var(--branco);
+            color: var(--verde-primario);
+            border-bottom: 3px solid var(--verde-primario);
+            font-weight: bold;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            background-color: var(--verde-claro);
+            color: var(--verde-escuro);
+        }
+        
+        .tab-content {
+            background: var(--branco);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+        
+        .page-title {
+            color: var(--verde-escuro);
+            border-bottom: 2px solid var(--verde-claro);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--verde-primario), var(--verde-secundario));
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .filter-section {
+            background-color: var(--verde-claro);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background-color: var(--verde-primario);
+            color: white;
+        }
+        
+        .map-container {
+            position: relative;
+            height: 500px;
+            background-color: #e9f5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .rs-map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .city-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--verde-primario);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .city-marker:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: var(--verde-escuro);
+        }
+        
+        .city-marker.high {
+            background-color: #4CAF50;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .city-marker.medium {
+            background-color: #8BC34A;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .city-marker.low {
+            background-color: #CDDC39;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .search-result-item:hover {
+            background-color: var(--verde-claro);
+        }
+        
+        .city-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 15px;
+        }
+        
+        .progress {
+            height: 10px;
+            margin-top: 5px;
+        }
+        
+        .region-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .region-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--verde-secundario);
+            background: white;
+            color: var(--verde-secundario);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .region-btn.active {
+            background: var(--verde-secundario);
+            color: white;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--verde-primario);
+            margin: 10px 0;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .year-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .year-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--verde-secundario);
+            background: white;
+            color: var(--verde-secundario);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .year-btn.active {
+            background: var(--verde-secundario);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <div class="logo-container">
+                    SUSTENTARE
+                </div>
+                <a class="navbar-brand" href="#">
+                    <strong>PROGRAMA SUSTENTARE</strong><br>
+                    <small>Sistema de Monitoramento</small>
+                </a>
+            </div>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="current-date"></span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Abas -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="cidades-tab" data-bs-toggle="tab" data-bs-target="#cidades" type="button" role="tab">
+                    <i class="fas fa-map-marked-alt me-2"></i>Cidades Recebedoras
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="descaracterizacao-tab" data-bs-toggle="tab" data-bs-target="#descaracterizacao" type="button" role="tab">
+                    <i class="fas fa-recycle me-2"></i>Trilha de Descaracterização
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-4" id="myTabContent">
+            <!-- Aba Cidades Recebedoras -->
+            <div class="tab-pane fade show active" id="cidades" role="tabpanel">
+                <h2 class="page-title">Monitoramento de Cidades Recebedoras</h2>
+                
+                <!-- Filtros -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Pesquisar Cidade</strong></label>
+                            <div class="search-box">
+                                <input type="text" class="form-control" id="city-search" placeholder="Digite o nome da cidade...">
+                                <div class="search-results" id="search-results"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><strong>Região</strong></label>
+                            <div class="region-selector">
+                                <div class="region-btn active" data-region="all">Todas as Regiões</div>
+                                <div class="region-btn" data-region="metropolitana">Metropolitana</div>
+                                <div class="region-btn" data-region="norte">Norte</div>
+                                <div class="region-btn" data-region="sul">Sul</div>
+                                <div class="region-btn" data-region="leste">Leste</div>
+                                <div class="region-btn" data-region="oeste">Oeste</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mapa e Lista -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-map-marked-alt me-2"></i>Distribuição por Cidades - Rio Grande do Sul
+                            </div>
+                            <div class="card-body">
+                                <div class="map-container">
+                                    <div class="rs-map" id="rs-map">
+                                        <!-- Marcadores de cidades serão adicionados via JavaScript -->
+                                    </div>
+                                    
+                                    <div class="legend">
+                                        <div class="legend-item">
+                                            <div class="legend-color high"></div>
+                                            <span>Alto percentual</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color medium"></div>
+                                            <span>Médio percentual</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color low"></div>
+                                            <span>Baixo percentual</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="city-info" id="city-info" style="display: none;">
+                                    <h5 id="city-name"></h5>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <strong>Percentual de Recebimento:</strong>
+                                            <div class="progress">
+                                                <div class="progress-bar" id="city-percent-bar" role="progressbar"></div>
+                                            </div>
+                                            <span id="city-percent-text"></span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Região:</strong> <span id="city-region"></span><br>
+                                            <strong>Status:</strong> <span id="city-status"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-list me-2"></i>Lista de Cidades Recebedoras
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Cidade</th>
+                                                <th>Região</th>
+                                                <th>Percentual</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cities-table">
+                                            <!-- Dados serão preenchidos via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <i class="fas fa-chart-pie me-2"></i>Distribuição por Região
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="regionChart" height="250"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba Descaracterização -->
+            <div class="tab-pane fade" id="descaracterizacao" role="tabpanel">
+                <h2 class="page-title">Trilha de Descaracterização</h2>
+                
+                <!-- Cards de Estatísticas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <i class="fas fa-weight-hanging fa-2x text-success"></i>
+                            <div class="stats-number" id="total-kg">1.793.484</div>
+                            <div>Total Geral (Kg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <i class="fas fa-recycle fa-2x text-success"></i>
+                            <div class="stats-number" id="total-rdaes">1.732.165</div>
+                            <div>Total RDAEs (Kg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <i class="fas fa-school fa-2x text-success"></i>
+                            <div class="stats-number" id="total-ecopontos">51.709</div>
+                            <div>Ecopontos SEDUC (Kg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <i class="fas fa-store fa-2x text-success"></i>
+                            <div class="stats-number" id="total-feira">9.610</div>
+                            <div>Feira PROCERGS (Kg)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros por Ano -->
+                <div class="filter-section">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="form-label"><strong>Selecionar Ano</strong></label>
+                            <div class="year-selector">
+                                <div class="year-btn active" data-year="all">Todos</div>
+                                <div class="year-btn" data-year="2025">2025</div>
+                                <div class="year-btn" data-year="2024">2024</div>
+                                <div class="year-btn" data-year="2023">2023</div>
+                                <div class="year-btn" data-year="2022">2022</div>
+                                <div class="year-btn" data-year="2021">2021</div>
+                                <div class="year-btn" data-year="2020">2020</div>
+                                <div class="year-btn" data-year="2019">2019</div>
+                                <div class="year-btn" data-year="2018">2018</div>
+                                <div class="year-btn" data-year="2017">2017</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line me-2"></i>Evolução Mensal de Descaracterização (Kg)
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="monthlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-bar me-2"></i>Total por Ano (Kg)
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="yearlyChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Dados -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-table me-2"></i>Ativos Coletados por Período (Kg)
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Ano</th>
+                                        <th>Mês</th>
+                                        <th>Peso (Kg)</th>
+                                        <th>Percentual do Ano</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="descaracterizacao-table">
+                                    <!-- Dados serão preenchidos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h6>Programa Sustentare - Sistema de Monitoramento</h6>
+                    <p class="mb-0">Monitoramento de cidades recebedoras e descaracterização no Rio Grande do Sul</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p class="mb-0">Última atualização: <span id="last-update"></span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dados das cidades do Rio Grande do Sul
+        const citiesData = [
+            { name: "Porto Alegre", region: "metropolitana", percent: 18.5, x: 65, y: 75 },
+            { name: "Caxias do Sul", region: "norte", percent: 12.2, x: 75, y: 45 },
+            { name: "Pelotas", region: "sul", percent: 9.8, x: 50, y: 90 },
+            { name: "Canoas", region: "metropolitana", percent: 8.7, x: 60, y: 70 },
+            { name: "Santa Maria", region: "central", percent: 7.5, x: 40, y: 60 },
+            { name: "Gravataí", region: "metropolitana", percent: 6.9, x: 65, y: 68 },
+            { name: "Viamão", region: "metropolitana", percent: 5.8, x: 68, y: 72 },
+            { name: "Novo Hamburgo", region: "metropolitana", percent: 5.2, x: 70, y: 65 },
+            { name: "São Leopoldo", region: "metropolitana", percent: 4.8, x: 68, y: 67 },
+            { name: "Rio Grande", region: "sul", percent: 4.5, x: 45, y: 95 },
+            { name: "Alvorada", region: "metropolitana", percent: 3.9, x: 63, y: 70 },
+            { name: "Passo Fundo", region: "norte", percent: 3.5, x: 55, y: 35 },
+            { name: "Sapucaia do Sul", region: "metropolitana", percent: 3.2, x: 67, y: 68 },
+            { name: "Uruguaiana", region: "oeste", percent: 2.8, x: 20, y: 50 },
+            { name: "Santa Cruz do Sul", region: "central", percent: 2.5, x: 55, y: 55 },
+            { name: "Cachoeirinha", region: "metropolitana", percent: 2.3, x: 64, y: 69 },
+            { name: "Bagé", region: "sul", percent: 2.1, x: 35, y: 85 },
+            { name: "Bento Gonçalves", region: "norte", percent: 1.9, x: 78, y: 48 },
+            { name: "Erechim", region: "norte", percent: 1.7, x: 65, y: 30 },
+            { name: "Guaíba", region: "metropolitana", percent: 1.5, x: 62, y: 72 }
+        ];
+
+        // Dados de descaracterização
+        const descaracterizacaoData = {
+            anos: [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+            totais: {
+                2017: 89431,
+                2018: 182234,
+                2019: 160141,
+                2020: 240089,
+                2021: 157071,
+                2022: 204368,
+                2023: 309897,
+                2024: 229376,
+                2025: 159558
+            },
+            meses: [
+                { nome: "JAN", ano: 2017, peso: 0 },
+                { nome: "FEV", ano: 2017, peso: 0 },
+                { nome: "MAR", ano: 2017, peso: 0 },
+                { nome: "ABR", ano: 2017, peso: 656 },
+                { nome: "MAI", ano: 2017, peso: 5195 },
+                { nome: "JUN", ano: 2017, peso: 10285 },
+                { nome: "JUL", ano: 2017, peso: 14281 },
+                { nome: "AGO", ano: 2017, peso: 9392 },
+                { nome: "SET", ano: 2017, peso: 4837 },
+                { nome: "OUT", ano: 2017, peso: 21930 },
+                { nome: "NOV", ano: 2017, peso: 4588 },
+                { nome: "DEZ", ano: 2017, peso: 18267 },
+                
+                { nome: "JAN", ano: 2018, peso: 12826 },
+                { nome: "FEV", ano: 2018, peso: 7247 },
+                { nome: "MAR", ano: 2018, peso: 17465 },
+                { nome: "ABR", ano: 2018, peso: 4284 },
+                { nome: "MAI", ano: 2018, peso: 10069 },
+                { nome: "JUN", ano: 2018, peso: 8692 },
+                { nome: "JUL", ano: 2018, peso: 15695 },
+                { nome: "AGO", ano: 2018, peso: 53658 },
+                { nome: "SET", ano: 2018, peso: 7000 },
+                { nome: "OUT", ano: 2018, peso: 16446 },
+                { nome: "NOV", ano: 2018, peso: 5164 },
+                { nome: "DEZ", ano: 2018, peso: 23688 },
+                
+                { nome: "JAN", ano: 2019, peso: 8215 },
+                { nome: "FEV", ano: 2019, peso: 14810 },
+                { nome: "MAR", ano: 2019, peso: 8322 },
+                { nome: "ABR", ano: 2019, peso: 5038 },
+                { nome: "MAI", ano: 2019, peso: 1177 },
+                { nome: "JUN", ano: 2019, peso: 4409 },
+                { nome: "JUL", ano: 2019, peso: 38880 },
+                { nome: "AGO", ano: 2019, peso: 9425 },
+                { nome: "SET", ano: 2019, peso: 16944 },
+                { nome: "OUT", ano: 2019, peso: 6692 },
+                { nome: "NOV", ano: 2019, peso: 35531 },
+                { nome: "DEZ", ano: 2019, peso: 10698 },
+                
+                { nome: "JAN", ano: 2020, peso: 14097 },
+                { nome: "FEV", ano: 2020, peso: 16825 },
+                { nome: "MAR", ano: 2020, peso: 20622 },
+                { nome: "ABR", ano: 2020, peso: 278 },
+                { nome: "MAI", ano: 2020, peso: 9682 },
+                { nome: "JUN", ano: 2020, peso: 7466 },
+                { nome: "JUL", ano: 2020, peso: 53755 },
+                { nome: "AGO", ano: 2020, peso: 9191 },
+                { nome: "SET", ano: 2020, peso: 32132 },
+                { nome: "OUT", ano: 2020, peso: 15739 },
+                { nome: "NOV", ano: 2020, peso: 38221 },
+                { nome: "DEZ", ano: 2020, peso: 22081 },
+                
+                { nome: "JAN", ano: 2021, peso: 20802 },
+                { nome: "FEV", ano: 2021, peso: 1128 },
+                { nome: "MAR", ano: 2021, peso: 2221 },
+                { nome: "ABR", ano: 2021, peso: 5060 },
+                { nome: "MAI", ano: 2021, peso: 20124 },
+                { nome: "JUN", ano: 2021, peso: 15159 },
+                { nome: "JUL", ano: 2021, peso: 6174 },
+                { nome: "AGO", ano: 2021, peso: 23817 },
+                { nome: "SET", ano: 2021, peso: 21874 },
+                { nome: "OUT", ano: 2021, peso: 24050 },
+                { nome: "NOV", ano: 2021, peso: 9042 },
+                { nome: "DEZ", ano: 2021, peso: 7620 },
+                
+                { nome: "JAN", ano: 2022, peso: 11017 },
+                { nome: "FEV", ano: 2022, peso: 14497 },
+                { nome: "MAR", ano: 2022, peso: 25382 },
+                { nome: "ABR", ano: 2022, peso: 10811 },
+                { nome: "MAI", ano: 2022, peso: 9782 },
+                { nome: "JUN", ano: 2022, peso: 22202 },
+                { nome: "JUL", ano: 2022, peso: 19838 },
+                { nome: "AGO", ano: 2022, peso: 33205 },
+                { nome: "SET", ano: 2022, peso: 19364 },
+                { nome: "OUT", ano: 2022, peso: 15976 },
+                { nome: "NOV", ano: 2022, peso: 6925 },
+                { nome: "DEZ", ano: 2022, peso: 15369 },
+                
+                { nome: "JAN", ano: 2023, peso: 24488 },
+                { nome: "FEV", ano: 2023, peso: 5615 },
+                { nome: "MAR", ano: 2023, peso: 32052 },
+                { nome: "ABR", ano: 2023, peso: 10205 },
+                { nome: "MAI", ano: 2023, peso: 24804 },
+                { nome: "JUN", ano: 2023, peso: 34541 },
+                { nome: "JUL", ano: 2023, peso: 46301 },
+                { nome: "AGO", ano: 2023, peso: 18743 },
+                { nome: "SET", ano: 2023, peso: 26033 },
+                { nome: "OUT", ano: 2023, peso: 44030 },
+                { nome: "NOV", ano: 2023, peso: 30781 },
+                { nome: "DEZ", ano: 2023, peso: 12304 },
+                
+                { nome: "JAN", ano: 2024, peso: 17913 },
+                { nome: "FEV", ano: 2024, peso: 11009 },
+                { nome: "MAR", ano: 2024, peso: 12368 },
+                { nome: "ABR", ano: 2024, peso: 15410 },
+                { nome: "MAI", ano: 2024, peso: 12141 },
+                { nome: "JUN", ano: 2024, peso: 13208 },
+                { nome: "JUL", ano: 2024, peso: 28139 },
+                { nome: "AGO", ano: 2024, peso: 36881 },
+                { nome: "SET", ano: 2024, peso: 23867 },
+                { nome: "OUT", ano: 2024, peso: 30535 },
+                { nome: "NOV", ano: 2024, peso: 13460 },
+                { nome: "DEZ", ano: 2024, peso: 14445 },
+                
+                { nome: "JAN", ano: 2025, peso: 18190 },
+                { nome: "FEV", ano: 2025, peso: 8344 },
+                { nome: "MAR", ano: 2025, peso: 1427 },
+                { nome: "ABR", ano: 2025, peso: 21888 },
+                { nome: "MAI", ano: 2025, peso: 27010 },
+                { nome: "JUN", ano: 2025, peso: 36209 },
+                { nome: "JUL", ano: 2025, peso: 29006 },
+                { nome: "AGO", ano: 2025, peso: 8372 },
+                { nome: "SET", ano: 2025, peso: 9112 }
+            ]
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            renderMap();
+            loadCitiesTable();
+            initializeRegionChart();
+            setupEventListeners();
+            loadDescaracterizacaoTable();
+            initializeDescaracterizacaoCharts();
+        });
+
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('pt-BR');
+            document.getElementById('last-update').textContent = 
+                now.toLocaleDateString('pt-BR');
+        }
+
+        function renderMap() {
+            const mapContainer = document.getElementById('rs-map');
+            
+            // Limpa marcadores existentes
+            const existingMarkers = document.querySelectorAll('.city-marker');
+            existingMarkers.forEach(marker => marker.remove());
+            
+            // Adiciona marcadores para cada cidade
+            citiesData.forEach(city => {
+                const marker = document.createElement('div');
+                marker.className = `city-marker ${getPercentClass(city.percent)}`;
+                marker.style.left = `${city.x}%`;
+                marker.style.top = `${city.y}%`;
+                marker.setAttribute('data-city', city.name);
+                marker.setAttribute('title', `${city.name} - ${city.percent}%`);
+                
+                marker.addEventListener('click', function() {
+                    showCityInfo(city);
+                });
+                
+                mapContainer.appendChild(marker);
+            });
+        }
+
+        function getPercentClass(percent) {
+            if (percent >= 10) return 'high';
+            if (percent >= 5) return 'medium';
+            return 'low';
+        }
+
+        function showCityInfo(city) {
+            document.getElementById('city-info').style.display = 'block';
+            document.getElementById('city-name').textContent = city.name;
+            document.getElementById('city-percent-bar').style.width = `${city.percent}%`;
+            document.getElementById('city-percent-text').textContent = `${city.percent}%`;
+            document.getElementById('city-region').textContent = getRegionName(city.region);
+            document.getElementById('city-status').textContent = getStatusByPercent(city.percent);
+            
+            // Atualiza a cor da barra de progresso
+            const percentBar = document.getElementById('city-percent-bar');
+            percentBar.className = 'progress-bar';
+            if (city.percent >= 10) {
+                percentBar.classList.add('bg-success');
+            } else if (city.percent >= 5) {
+                percentBar.classList.add('bg-warning');
+            } else {
+                percentBar.classList.add('bg-info');
+            }
+        }
+
+        function getRegionName(region) {
+            const regions = {
+                'metropolitana': 'Metropolitana',
+                'norte': 'Norte',
+                'sul': 'Sul',
+                'leste': 'Leste',
+                'oeste': 'Oeste',
+                'central': 'Central'
+            };
+            return regions[region] || region;
+        }
+
+        function getStatusByPercent(percent) {
+            if (percent >= 10) return 'Alto recebimento';
+            if (percent >= 5) return 'Médio recebimento';
+            return 'Baixo recebimento';
+        }
+
+        function loadCitiesTable() {
+            const table = document.getElementById('cities-table');
+            table.innerHTML = '';
+            
+            // Ordena cidades por percentual (maior para menor)
+            const sortedCities = [...citiesData].sort((a, b) => b.percent - a.percent);
+            
+            sortedCities.forEach(city => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${city.name}</td>
+                    <td>${getRegionName(city.region)}</td>
+                    <td>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar ${getPercentClass(city.percent)}" 
+                                 style="width: ${city.percent}%"></div>
+                        </div>
+                        <small>${city.percent}%</small>
+                    </td>
+                `;
+                
+                row.addEventListener('click', function() {
+                    showCityInfo(city);
+                });
+                
+                table.appendChild(row);
+            });
+        }
+
+        function initializeRegionChart() {
+            const ctx = document.getElementById('regionChart').getContext('2d');
+            
+            // Calcula totais por região
+            const regionTotals = {};
+            citiesData.forEach(city => {
+                if (!regionTotals[city.region]) {
+                    regionTotals[city.region] = 0;
+                }
+                regionTotals[city.region] += city.percent;
+            });
+            
+            const regions = Object.keys(regionTotals);
+            const data = Object.values(regionTotals);
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: regions.map(region => getRegionName(region)),
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#2196F3',
+                            '#FF9800',
+                            '#9C27B0',
+                            '#F44336',
+                            '#00BCD4'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed.toFixed(1)}% (${percentage}% do total)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadDescaracterizacaoTable() {
+            const table = document.getElementById('descaracterizacao-table');
+            table.innerHTML = '';
+            
+            // Ordena por ano e mês
+            const mesesOrdenados = [...descaracterizacaoData.meses].sort((a, b) => {
+                if (a.ano !== b.ano) return b.ano - a.ano;
+                const meses = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+                return meses.indexOf(a.nome) - meses.indexOf(b.nome);
+            });
+            
+            mesesOrdenados.forEach(mes => {
+                const percentualAno = ((mes.peso / descaracterizacaoData.totais[mes.ano]) * 100).toFixed(1);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${mes.ano}</td>
+                    <td>${mes.nome}</td>
+                    <td>${mes.peso.toLocaleString('pt-BR')}</td>
+                    <td>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: ${percentualAno}%"></div>
+                        </div>
+                        <small>${percentualAno}%</small>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function initializeDescaracterizacaoCharts() {
+            // Gráfico mensal
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            
+            // Agrupa dados por ano para o gráfico
+            const anosParaGrafico = [2023, 2024, 2025];
+            const datasets = anosParaGrafico.map(ano => {
+                const dadosAno = descaracterizacaoData.meses
+                    .filter(mes => mes.ano === ano)
+                    .sort((a, b) => {
+                        const meses = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+                        return meses.indexOf(a.nome) - meses.indexOf(b.nome);
+                    });
+                
+                return {
+                    label: ano.toString(),
+                    data: dadosAno.map(mes => mes.peso),
+                    borderColor: getDescaracterizacaoColor(ano),
+                    backgroundColor: getDescaracterizacaoColor(ano, 0.1),
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4
+                };
+            });
+            
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolução Mensal (Kg)'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Peso (Kg)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico anual
+            const yearlyCtx = document.getElementById('yearlyChart').getContext('2d');
+            
+            new Chart(yearlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: descaracterizacaoData.anos,
+                    datasets: [{
+                        label: 'Total por Ano (Kg)',
+                        data: descaracterizacaoData.anos.map(ano => descaracterizacaoData.totais[ano]),
+                        backgroundColor: descaracterizacaoData.anos.map(ano => getDescaracterizacaoColor(ano, 0.7)),
+                        borderColor: descaracterizacaoData.anos.map(ano => getDescaracterizacaoColor(ano)),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total por Ano'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Peso (Kg)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getDescaracterizacaoColor(ano, alpha = 1) {
+            const colors = {
+                2017: `rgba(76, 175, 80, ${alpha})`,
+                2018: `rgba(33, 150, 243, ${alpha})`,
+                2019: `rgba(156, 39, 176, ${alpha})`,
+                2020: `rgba(255, 152, 0, ${alpha})`,
+                2021: `rgba(0, 188, 212, ${alpha})`,
+                2022: `rgba(103, 58, 183, ${alpha})`,
+                2023: `rgba(244, 67, 54, ${alpha})`,
+                2024: `rgba(121, 85, 72, ${alpha})`,
+                2025: `rgba(255, 193, 7, ${alpha})`
+            };
+            return colors[ano] || `rgba(100, 100, 100, ${alpha})`;
+        }
+
+        function setupEventListeners() {
+            // Pesquisa de cidades
+            document.getElementById('city-search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results');
+                
+                if (searchTerm.length < 2) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+                
+                const filteredCities = citiesData.filter(city => 
+                    city.name.toLowerCase().includes(searchTerm)
+                );
+                
+                if (filteredCities.length > 0) {
+                    resultsContainer.innerHTML = '';
+                    filteredCities.forEach(city => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.textContent = `${city.name} - ${getRegionName(city.region)} (${city.percent}%)`;
+                        item.addEventListener('click', function() {
+                            document.getElementById('city-search').value = city.name;
+                            resultsContainer.style.display = 'none';
+                            showCityInfo(city);
+                        });
+                        resultsContainer.appendChild(item);
+                    });
+                    resultsContainer.style.display = 'block';
+                } else {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+            
+            // Fecha resultados ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('search-results').style.display = 'none';
+                }
+            });
+            
+            // Filtros por região
+            document.querySelectorAll('.region-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const region = this.getAttribute('data-region');
+                    filterByRegion(region);
+                });
+            });
+            
+            // Filtros por ano na aba de descaracterização
+            document.querySelectorAll('.year-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const year = this.getAttribute('data-year');
+                    filterByYear(year);
+                });
+            });
+        }
+
+        function filterByRegion(region) {
+            const tableRows = document.querySelectorAll('#cities-table tr');
+            const markers = document.querySelectorAll('.city-marker');
+            
+            if (region === 'all') {
+                // Mostra todas as cidades
+                tableRows.forEach(row => row.style.display = '');
+                markers.forEach(marker => marker.style.display = 'block');
+            } else {
+                // Filtra por região
+                tableRows.forEach(row => {
+                    const cityName = row.cells[0].textContent;
+                    const city = citiesData.find(c => c.name === cityName);
+                    if (city && city.region === region) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                markers.forEach(marker => {
+                    const cityName = marker.getAttribute('data-city');
+                    const city = citiesData.find(c => c.name === cityName);
+                    if (city && city.region === region) {
+                        marker.style.display = 'block';
+                    } else {
+                        marker.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        function filterByYear(year) {
+            const tableRows = document.querySelectorAll('#descaracterizacao-table tr');
+            
+            if (year === 'all') {
+                // Mostra todos os anos
+                tableRows.forEach(row => row.style.display = '');
+            } else {
+                // Filtra por ano
+                tableRows.forEach(row => {
+                    const anoRow = row.cells[0].textContent;
+                    if (anoRow === year) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
