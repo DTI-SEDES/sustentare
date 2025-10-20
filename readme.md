@@ -18,12 +18,4 @@ Sistema de monitoramento e análise dos indicadores de sustentabilidade, incluin
 
 ### Instalação
 ```bash
-# Clone o repositório
-git clone https://github.com/DTI-SEDES/sustentare.git
-cd sustentare
-
-# Instale as dependências
-pip install -r requirements.txt
-
-# Execute o aplicativo
-streamlit run app.py
+Em desenvolvimento Coordenador PROGRAMA
