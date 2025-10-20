@@ -1,0 +1,16 @@
+:root {
+  --verde: #4CAF50;
+  --vermelho: #F44336;
+  --amarelo: #FFEB3B;
+  --cinza: #f4f4f4;
+  --escuro: #232323;
+}
+body { font-family: sans-serif; background: var(--cinza); color: var(--escuro);}
+header { background: linear-gradient(90deg, var(--verde), var(--amarelo)); color: var(--escuro); padding: 1em;}
+nav a { margin: 0 1em; color: var(--escuro); font-weight: bold;}
+table { width: 100%; border-collapse: collapse; margin-top: 1em;}
+th { background: var(--amarelo); }
+tr.success { background: var(--verde); color: var(--escuro);}
+tr.low { background: var(--vermelho); color: var(--escuro);}
+button { background: var(--verde); color: var(--escuro); border: none; padding: 0.5em 1em;}
+input, select { margin: 0.2em;}
