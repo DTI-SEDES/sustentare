@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="sustentare",
-    version="1.0.0",
+    version="1.1.0",
     description="Programa Sustentare - DTI/SEDES",
     packages=find_packages(),
     install_requires=[
