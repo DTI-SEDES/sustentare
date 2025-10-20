@@ -1,661 +1,343 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sustentare - Sistema de Gestão</title>
-    <style>
-        :root {
-            --primary: #2e7d32;
-            --primary-dark: #1b5e20;
-            --primary-light: #4caf50;
-            --secondary: #ff9800;
-            --text: #333;
-            --text-light: #666;
-            --background: #f5f5f5;
-            --white: #ffffff;
-            --error: #f44336;
-            --success: #4caf50;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header */
-        header {
-            background-color: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo img {
-            height: 40px;
-        }
-        
-        .logo h1 {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-        
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 20px;
-        }
-        
-        nav a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            transition: color 0.3s;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        
-        nav a:hover, nav a.active {
-            color: var(--primary);
-            background-color: rgba(46, 125, 50, 0.1);
-        }
-        
-        .user-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        .btn-secondary:hover {
-            background-color: rgba(46, 125, 50, 0.1);
-        }
-        
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        
-        .hero h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-        }
-        
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        /* Features */
-        .features {
-            padding: 80px 0;
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-        
-        .section-title h2 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        
-        .section-title p {
-            color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .feature-card {
-            background-color: var(--white);
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-align: center;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .feature-icon {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-        
-        .feature-card h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
-        /* Login Form */
-        .login-section {
-            background-color: var(--white);
-            padding: 80px 0;
-        }
-        
-        .login-container {
-            max-width: 400px;
-            margin: 0 auto;
-            background-color: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .login-container h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border 0.3s;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        
-        .form-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .forgot-password {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .btn-login:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .register-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--primary-dark);
-            color: white;
-            padding: 50px 0 20px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-        
-        .footer-column h3::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            height: 2px;
-            background-color: var(--secondary);
-        }
-        
-        .footer-column ul {
-            list-style: none;
-        }
-        
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-column a {
-            color: #ddd;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-column a:hover {
-            color: white;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            background-color: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transition: background-color 0.3s;
-        }
-        
-        .social-links a:hover {
-            background-color: var(--primary-light);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .hero h2 {
-                font-size: 2rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .features {
-                padding: 50px 0;
-            }
-            
-            .login-container {
-                padding: 30px 20px;
-            }
-        }
-        
-        /* Error states */
-        .error {
-            color: var(--error);
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .form-control.error-field {
-            border-color: var(--error);
-        }
-        
-        /* Success message */
-        .success-message {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: var(--success);
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIwIDBDOC45NTQgMCAwIDguOTU0IDAgMjBDMCAzMS4wNDYgOC45NTQgNDAgMjAgNDBDMzEuMDQ2IDQwIDQwIDMxLjA0NiA0MCAyMEM0MCA4Ljk1NCAzMS4wNDYgMCAyMCAwWk0zMSAyNkgyNlYzMUgxNFYyNkg5VjE0SDE0VjloMTJ2NUgyNlYyNloiIGZpbGw9IiMyZTdkMzIiLz4KPC9zdmc+" alt="Sustentare Logo">
-                    <h1>Sustentare</h1>
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="#" class="active">Início</a></li>
-                        <li><a href="#">Sobre</a></li>
-                        <li><a href="#">Funcionalidades</a></li>
-                        <li><a href="#">Preços</a></li>
-                        <li><a href="#">Contato</a></li>
-                    </ul>
-                </nav>
-                <div class="user-actions">
-                    <button class="btn btn-secondary" id="loginBtn">Entrar</button>
-                    <button class="btn btn-primary" id="registerBtn">Cadastrar</button>
-                </div>
-            </div>
-        </div>
-    </header>
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+from datetime import datetime
+import io
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h2>Gestão Sustentável para o seu Negócio</h2>
-            <p>O Sustentare é uma plataforma completa para gerenciar processos, otimizar recursos e promover a sustentabilidade na sua empresa.</p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary">Começar Agora</button>
-                <button class="btn btn-secondary">Saiba Mais</button>
-            </div>
-        </div>
-    </section>
+# Configuração da página
+st.set_page_config(
+    page_title="Programa de Sustentabilidade",
+    page_icon="♻️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-title">
-                <h2>Funcionalidades Principais</h2>
-                <p>Descubra como o Sustentare pode transformar a gestão da sua empresa</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Análise de Dados</h3>
-                    <p>Obtenha insights valiosos através de relatórios detalhados e dashboards interativos.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌱</div>
-                    <h3>Gestão Sustentável</h3>
-                    <p>Monitore e reduza o impacto ambiental da sua empresa com ferramentas especializadas.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚙️</div>
-                    <h3>Automação de Processos</h3>
-                    <p>Otimize operações e reduza custos com a automação de tarefas repetitivas.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Segurança de Dados</h3>
-                    <p>Proteja as informações da sua empresa com criptografia e backups automáticos.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📈</div>
-                    <h3>Relatórios Personalizados</h3>
-                    <p>Crie relatórios customizados para atender às necessidades específicas do seu negócio.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🤝</div>
-                    <h3>Colaboração em Equipe</h3>
-                    <p>Facilite a comunicação e o trabalho em equipe com ferramentas de colaboração integradas.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+# Função para carregar os dados da planilha
+@st.cache_data
+def load_data():
+    # Dados de destinação (peso em kg) por mês e ano
+    dest_data = {
+        'Ano': [2017, 2017, 2017, 2017, 2017, 2017, 2017, 2017, 2017, 2017, 2017, 2017,
+                2018, 2018, 2018, 2018, 2018, 2018, 2018, 2018, 2018, 2018, 2018, 2018,
+                2019, 2019, 2019, 2019, 2019, 2019, 2019, 2019, 2019, 2019, 2019, 2019,
+                2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020,
+                2021, 2021, 2021, 2021, 2021, 2021, 2021, 2021, 2021, 2021, 2021, 2021,
+                2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022,
+                2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023,
+                2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024,
+                2025, 2025, 2025, 2025, 2025, 2025, 2025, 2025, 2025],
+        'Mês': ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'] * 8 + ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET'],
+        'Peso_kg': [0, 0, 0, 656, 5195, 10285, 14281, 9392, 4837, 21930, 4588, 18267,
+                    12826, 7247, 17465, 4284, 10069, 8692, 15695, 53658, 7000, 16446, 5164, 23688,
+                    8215, 14810, 8322, 5038, 1177, 4409, 38880, 9425, 16944, 6692, 35531, 10698,
+                    14097, 16825, 20622, 278, 9682, 7466, 53755, 9191, 32132, 15739, 38221, 22081,
+                    20802, 1128, 2221, 5060, 20124, 15159, 6174, 23817, 21874, 24050, 9042, 7620,
+                    11017, 14497, 25382, 10811, 9782, 22202, 19838, 33205, 19364, 15976, 6925, 15369,
+                    24488, 5615, 32052, 10205, 24804, 34541, 46301, 18743, 26033, 44030, 30781, 12304,
+                    17913, 11009, 12368, 15410, 12141, 13208, 28139, 36881, 23867, 30535, 13460, 14445,
+                    18190, 8344, 1427, 21888, 27010, 36209, 29006, 8372, 9112]
+    }
+    
+    # Dados de doações (quantidade) por mês e ano
+    doacao_data = {
+        'Ano': [2017, 2017, 2017, 2017, 2018, 2018, 2018, 2018, 2018, 2018, 2019, 2019, 2019, 2019, 2019, 2019, 2019,
+                2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2020, 2021, 2021, 2021, 2021, 2021, 2021, 2021,
+                2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023, 2023,
+                2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2024, 2025, 2025, 2025, 2025, 2025, 2025, 2025, 2025, 2025],
+        'Mês': ['MAI', 'NOV', 'JAN', 'JUN', 'AGO', 'NOV', 'JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'SET', 'DEZ', 'FEV', 'ABR', 'JUN', 'JUL', 'AGO', 'SET', 'MAR', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', 'FEV', 'JUN', 'JUL', 'AGO', 'SET', 'MAR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', 'JAN', 'FEV', 'MAR', 'ABR', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET'],
+        'Quantidade': [45, 24, 11, 26, 17, 18, 10, 40, 5, 70, 20, 33, 35, 11, 2, 20, 33, 3, 5, 3, 15, 5, 15, 5, 3, 11, 4, 44, 48, 20, 10, 10, 41, 8, 21, 70, 30, 29, 10, 74, 58, 106, 39, 51, 93, 84, 70, 60, 107, 15, 74, 25, 55, 120, 42, 49, 47, 70, 99, 154, 408, 136, 51, 91, 174, 115, 123, 95, 124]
+    }
+    
+    # Criar DataFrames
+    df_dest = pd.DataFrame(dest_data)
+    df_doacao = pd.DataFrame(doacao_data)
+    
+    # Adicionar coluna de data completa para ordenação
+    meses_pt = {'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6, 
+                'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12}
+    
+    df_dest['Mes_num'] = df_dest['Mês'].map(meses_pt)
+    df_dest['Data'] = pd.to_datetime(df_dest['Ano'].astype(str) + '-' + df_dest['Mes_num'].astype(str) + '-01')
+    
+    df_doacao['Mes_num'] = df_doacao['Mês'].map(meses_pt)
+    df_doacao['Data'] = pd.to_datetime(df_doacao['Ano'].astype(str) + '-' + df_doacao['Mes_num'].astype(str) + '-01')
+    
+    return df_dest, df_doacao
 
-    <!-- Login Section -->
-    <section class="login-section" id="loginSection">
-        <div class="container">
-            <div class="login-container">
-                <h2>Acesse sua Conta</h2>
-                <div class="success-message" id="successMessage">
-                    Login realizado com sucesso!
-                </div>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">E-mail</label>
-                        <input type="email" class="form-control" id="email" placeholder="seu@email.com">
-                        <div class="error" id="emailError">Por favor, insira um e-mail válido</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Senha</label>
-                        <input type="password" class="form-control" id="password" placeholder="Sua senha">
-                        <div class="error" id="passwordError">A senha deve ter pelo menos 6 caracteres</div>
-                    </div>
-                    <div class="form-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember">
-                            <label for="remember">Lembrar-me</label>
-                        </div>
-                        <a href="#" class="forgot-password">Esqueceu a senha?</a>
-                    </div>
-                    <button type="submit" class="btn-login">Entrar</button>
-                </form>
-                <div class="register-link">
-                    <p>Não tem uma conta? <a href="#" id="showRegister">Cadastre-se</a></p>
-                </div>
-            </div>
-        </div>
-    </section>
+# Carregar dados
+df_dest, df_doacao = load_data()
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Sustentare</h3>
-                    <p>Soluções inovadoras para gestão empresarial sustentável.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook">f</a>
-                        <a href="#" aria-label="Twitter">t</a>
-                        <a href="#" aria-label="LinkedIn">in</a>
-                        <a href="#" aria-label="Instagram">ig</a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Links Rápidos</h3>
-                    <ul>
-                        <li><a href="#">Início</a></li>
-                        <li><a href="#">Sobre Nós</a></li>
-                        <li><a href="#">Funcionalidades</a></li>
-                        <li><a href="#">Preços</a></li>
-                        <li><a href="#">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Suporte</h3>
-                    <ul>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Central de Ajuda</a></li>
-                        <li><a href="#">Contato</a></li>
-                        <li><a href="#">Política de Privacidade</a></li>
-                        <li><a href="#">Termos de Uso</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Contato</h3>
-                    <ul>
-                        <li>Email: contato@sustentare.com</li>
-                        <li>Telefone: (11) 1234-5678</li>
-                        <li>Endereço: Rua Exemplo, 123 - São Paulo, SP</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2023 Sustentare. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
+# Sidebar
+st.sidebar.title("Navegação")
+aba_selecionada = st.sidebar.radio("Selecione a aba:", ["Início", "Sobre", "DADOS de Destinação", "Doados"])
 
-    <script>
-        // Form validation
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email');
-            const password = document.getElementById('password');
-            const emailError = document.getElementById('emailError');
-            const passwordError = document.getElementById('passwordError');
-            const successMessage = document.getElementById('successMessage');
-            
-            let isValid = true;
-            
-            // Reset errors
-            email.classList.remove('error-field');
-            password.classList.remove('error-field');
-            emailError.style.display = 'none';
-            passwordError.style.display = 'none';
-            
-            // Validate email
-            if (!email.value || !isValidEmail(email.value)) {
-                email.classList.add('error-field');
-                emailError.style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validate password
-            if (!password.value || password.value.length < 6) {
-                password.classList.add('error-field');
-                passwordError.style.display = 'block';
-                isValid = false;
-            }
-            
-            // If form is valid, show success message
-            if (isValid) {
-                successMessage.style.display = 'block';
-                // In a real application, you would submit the form here
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 3000);
-            }
-        });
+# Página Início
+if aba_selecionada == "Início":
+    st.title("Programa de Sustentabilidade - Análise de Dados")
+    st.markdown("---")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Resumo de Destinação")
+        total_dest = df_dest['Peso_kg'].sum()
+        st.metric("Total de Materiais Destinados", f"{total_dest:,.0f} kg")
         
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
+        # Gráfico de destinação por ano
+        dest_ano = df_dest.groupby('Ano')['Peso_kg'].sum().reset_index()
+        fig_dest = px.bar(dest_ano, x='Ano', y='Peso_kg', 
+                         title="Destinação de Materiais por Ano (kg)",
+                         labels={'Peso_kg': 'Peso (kg)', 'Ano': 'Ano'})
+        st.plotly_chart(fig_dest, use_container_width=True)
+    
+    with col2:
+        st.subheader("Resumo de Doações")
+        total_doacao = df_doacao['Quantidade'].sum()
+        st.metric("Total de Itens Doados", f"{total_doacao:,.0f} unidades")
         
-        // Navigation buttons
-        document.getElementById('loginBtn').addEventListener('click', function() {
-            document.getElementById('loginSection').scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        document.getElementById('registerBtn').addEventListener('click', function() {
-            alert('Funcionalidade de cadastro em desenvolvimento!');
-        });
-        
-        document.getElementById('showRegister').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Funcionalidade de cadastro em desenvolvimento!');
-        });
-    </script>
-</body>
-</html>
+        # Gráfico de doações por ano
+        doacao_ano = df_doacao.groupby('Ano')['Quantidade'].sum().reset_index()
+        fig_doacao = px.bar(doacao_ano, x='Ano', y='Quantidade', 
+                           title="Doações por Ano (unidades)",
+                           labels={'Quantidade': 'Quantidade', 'Ano': 'Ano'})
+        st.plotly_chart(fig_doacao, use_container_width=True)
+    
+    st.markdown("---")
+    st.subheader("Visão Geral do Programa")
+    st.markdown("""
+    Este programa governamental tem como objetivo promover a sustentabilidade através de:
+    - **Destinação adequada** de materiais eletrônicos e outros resíduos
+    - **Doação de equipamentos** recondicionados para instituições
+    - **Redução do impacto ambiental** através da reciclagem e reutilização
+    
+    Os dados apresentados mostram a evolução das atividades do programa ao longo dos anos,
+    demonstrando seu crescimento e impacto positivo na sociedade.
+    """)
+
+# Página Sobre
+elif aba_selecionada == "Sobre":
+    st.title("Sobre o Programa")
+    st.markdown("---")
+    
+    st.subheader("Objetivos do Programa")
+    st.markdown("""
+    O Programa de Sustentabilidade tem como principais objetivos:
+    
+    1. **Promover a destinação ambientalmente adequada** de resíduos eletrônicos e outros materiais
+    2. **Fomentar a economia circular** através do reaproveitamento de equipamentos
+    3. **Reduzir o impacto ambiental** causado pelo descarte inadequado
+    4. **Beneficiar instituições** através da doação de equipamentos recondicionados
+    5. **Conscientizar a sociedade** sobre a importância da sustentabilidade
+    """)
+    
+    st.subheader("Metodologia")
+    st.markdown("""
+    O programa opera através de:
+    
+    - **Coleta seletiva** de materiais em pontos específicos
+    - **Triagem e classificação** dos itens recebidos
+    - **Reparação e recondicionamento** de equipamentos eletrônicos
+    - **Destinação adequada** de materiais não passíveis de reaproveitamento
+    - **Distribuição** dos equipamentos recondicionados para instituições beneficiárias
+    """)
+    
+    st.subheader("Impacto")
+    st.markdown("""
+    Desde sua implementação, o programa já:
+    
+    - Destinou **{:,} kg** de materiais adequadamente
+    - Doou **{:,}** equipamentos recondicionados
+    - Beneficiou diversas instituições em todo o estado
+    - Contribuiu para a redução de resíduos em aterros sanitários
+    """.format(df_dest['Peso_kg'].sum(), df_doacao['Quantidade'].sum()))
+
+# Página DADOS de Destinação
+elif aba_selecionada == "DADOS de Destinação":
+    st.title("DADOS de Destinação")
+    st.markdown("---")
+    
+    # Filtros
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        anos = sorted(df_dest['Ano'].unique())
+        ano_selecionado = st.selectbox("Selecione o ano:", ["Todos"] + anos)
+    
+    with col2:
+        meses = sorted(df_dest['Mês'].unique(), key=lambda x: list({'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6, 
+                                                                    'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12}.keys()).index(x))
+        mes_selecionado = st.selectbox("Selecione o mês:", ["Todos"] + meses)
+    
+    # Aplicar filtros
+    df_filtrado = df_dest.copy()
+    
+    if ano_selecionado != "Todos":
+        df_filtrado = df_filtrado[df_filtrado['Ano'] == ano_selecionado]
+    
+    if mes_selecionado != "Todos":
+        df_filtrado = df_filtrado[df_filtrado['Mês'] == mes_selecionado]
+    
+    # Métricas
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        total_filtrado = df_filtrado['Peso_kg'].sum()
+        st.metric("Total Destinado (kg)", f"{total_filtrado:,.0f}")
+    
+    with col2:
+        media_mensal = df_filtrado.groupby(['Ano', 'Mês'])['Peso_kg'].sum().mean()
+        st.metric("Média Mensal (kg)", f"{media_mensal:,.0f}")
+    
+    with col3:
+        max_mes = df_filtrado.loc[df_filtrado['Peso_kg'].idxmax()] if not df_filtrado.empty else None
+        if max_mes is not None:
+            st.metric("Mês com Maior Destinação", f"{max_mes['Mês']}/{max_mes['Ano']}")
+    
+    st.markdown("---")
+    
+    # Gráficos
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if ano_selecionado == "Todos":
+            # Gráfico de destinação por ano
+            dest_ano = df_filtrado.groupby('Ano')['Peso_kg'].sum().reset_index()
+            fig_ano = px.bar(dest_ano, x='Ano', y='Peso_kg',
+                            title="Destinação por Ano (kg)",
+                            labels={'Peso_kg': 'Peso (kg)', 'Ano': 'Ano'})
+            st.plotly_chart(fig_ano, use_container_width=True)
+        else:
+            # Gráfico de destinação por mês no ano selecionado
+            dest_mes = df_filtrado.groupby('Mês')['Peso_kg'].sum().reset_index()
+            # Ordenar por ordem dos meses
+            ordem_meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+            dest_mes['Mês'] = pd.Categorical(dest_mes['Mês'], categories=ordem_meses, ordered=True)
+            dest_mes = dest_mes.sort_values('Mês')
+            
+            fig_mes = px.bar(dest_mes, x='Mês', y='Peso_kg',
+                            title=f"Destinação por Mês em {ano_selecionado} (kg)",
+                            labels={'Peso_kg': 'Peso (kg)', 'Mês': 'Mês'})
+            st.plotly_chart(fig_mes, use_container_width=True)
+    
+    with col2:
+        # Gráfico de linha temporal
+        df_temporal = df_filtrado.sort_values('Data')
+        fig_temporal = px.line(df_temporal, x='Data', y='Peso_kg',
+                              title="Evolução Temporal da Destinação (kg)",
+                              labels={'Peso_kg': 'Peso (kg)', 'Data': 'Data'})
+        st.plotly_chart(fig_temporal, use_container_width=True)
+    
+    # Tabela de dados
+    st.subheader("Dados Detalhados")
+    df_tabela = df_filtrado[['Ano', 'Mês', 'Peso_kg']].sort_values(['Ano', 'Mes_num'])
+    df_tabela = df_tabela.rename(columns={'Peso_kg': 'Peso (kg)'})
+    st.dataframe(df_tabela, use_container_width=True)
+    
+    # Botão para download
+    csv = df_tabela.to_csv(index=False)
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv,
+        file_name=f"dados_destinacao_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
+
+# Página Doados
+elif aba_selecionada == "Doados":
+    st.title("Itens Doados")
+    st.markdown("---")
+    
+    # Filtros
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        anos_doacao = sorted(df_doacao['Ano'].unique())
+        ano_selecionado_doacao = st.selectbox("Selecione o ano:", ["Todos"] + anos_doacao, key="ano_doacao")
+    
+    with col2:
+        meses_doacao = sorted(df_doacao['Mês'].unique(), key=lambda x: list({'JAN': 1, 'FEV': 2, 'MAR': 3, 'ABR': 4, 'MAI': 5, 'JUN': 6, 
+                                                                             'JUL': 7, 'AGO': 8, 'SET': 9, 'OUT': 10, 'NOV': 11, 'DEZ': 12}.keys()).index(x))
+        mes_selecionado_doacao = st.selectbox("Selecione o mês:", ["Todos"] + meses_doacao, key="mes_doacao")
+    
+    # Aplicar filtros
+    df_filtrado_doacao = df_doacao.copy()
+    
+    if ano_selecionado_doacao != "Todos":
+        df_filtrado_doacao = df_filtrado_doacao[df_filtrado_doacao['Ano'] == ano_selecionado_doacao]
+    
+    if mes_selecionado_doacao != "Todos":
+        df_filtrado_doacao = df_filtrado_doacao[df_filtrado_doacao['Mês'] == mes_selecionado_doacao]
+    
+    # Métricas
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        total_filtrado_doacao = df_filtrado_doacao['Quantidade'].sum()
+        st.metric("Total Doado", f"{total_filtrado_doacao:,.0f} unidades")
+    
+    with col2:
+        media_mensal_doacao = df_filtrado_doacao.groupby(['Ano', 'Mês'])['Quantidade'].sum().mean()
+        st.metric("Média Mensal", f"{media_mensal_doacao:,.0f} unidades")
+    
+    with col3:
+        max_mes_doacao = df_filtrado_doacao.loc[df_filtrado_doacao['Quantidade'].idxmax()] if not df_filtrado_doacao.empty else None
+        if max_mes_doacao is not None:
+            st.metric("Mês com Mais Doações", f"{max_mes_doacao['Mês']}/{max_mes_doacao['Ano']}")
+    
+    st.markdown("---")
+    
+    # Gráficos
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if ano_selecionado_doacao == "Todos":
+            # Gráfico de doações por ano
+            doacao_ano = df_filtrado_doacao.groupby('Ano')['Quantidade'].sum().reset_index()
+            fig_ano_doacao = px.bar(doacao_ano, x='Ano', y='Quantidade',
+                                   title="Doações por Ano (unidades)",
+                                   labels={'Quantidade': 'Quantidade', 'Ano': 'Ano'})
+            st.plotly_chart(fig_ano_doacao, use_container_width=True)
+        else:
+            # Gráfico de doações por mês no ano selecionado
+            doacao_mes = df_filtrado_doacao.groupby('Mês')['Quantidade'].sum().reset_index()
+            # Ordenar por ordem dos meses
+            ordem_meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+            doacao_mes['Mês'] = pd.Categorical(doacao_mes['Mês'], categories=ordem_meses, ordered=True)
+            doacao_mes = doacao_mes.sort_values('Mês')
+            
+            fig_mes_doacao = px.bar(doacao_mes, x='Mês', y='Quantidade',
+                                   title=f"Doações por Mês em {ano_selecionado_doacao} (unidades)",
+                                   labels={'Quantidade': 'Quantidade', 'Mês': 'Mês'})
+            st.plotly_chart(fig_mes_doacao, use_container_width=True)
+    
+    with col2:
+        # Gráfico de linha temporal
+        df_temporal_doacao = df_filtrado_doacao.sort_values('Data')
+        fig_temporal_doacao = px.line(df_temporal_doacao, x='Data', y='Quantidade',
+                                     title="Evolução Temporal das Doações (unidades)",
+                                     labels={'Quantidade': 'Quantidade', 'Data': 'Data'})
+        st.plotly_chart(fig_temporal_doacao, use_container_width=True)
+    
+    # Tabela de dados
+    st.subheader("Dados Detalhados")
+    df_tabela_doacao = df_filtrado_doacao[['Ano', 'Mês', 'Quantidade']].sort_values(['Ano', 'Mes_num'])
+    df_tabela_doacao = df_tabela_doacao.rename(columns={'Quantidade': 'Quantidade (unidades)'})
+    st.dataframe(df_tabela_doacao, use_container_width=True)
+    
+    # Botão para download
+    csv_doacao = df_tabela_doacao.to_csv(index=False)
+    st.download_button(
+        label="Baixar dados como CSV",
+        data=csv_doacao,
+        file_name=f"dados_doacoes_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv",
+        key="download_doacao"
+    )
+
+# Rodapé
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: gray;'>Programa de Sustentabilidade - Dados de 2017 a 2025</div>",
+    unsafe_allow_html=True
+)
