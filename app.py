@@ -1,6 +1,3 @@
-
-### 2. **app.py** (Aplicativo principal)
-```python
 # app.py - Aplicativo Principal do Programa Sustentare
 import streamlit as st
 import pandas as pd
@@ -11,7 +8,7 @@ import io
 
 # Configuração da página
 st.set_page_config(
-    page_title="Sustentare - DTI/SEDES",
+    page_title="Sustentare",
     page_icon="♻️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -89,7 +86,6 @@ def main():
     st.markdown('<h1 class="main-header">♻️ Programa Sustentare - DTI/SEDES</h1>', unsafe_allow_html=True)
     
     # Sidebar
-    st.sidebar.image("https://via.placeholder.com/150x50/1E88E5/FFFFFF?text=DTI-SEDES", use_column_width=True)
     st.sidebar.title("Navegação")
     aba_selecionada = st.sidebar.radio("Selecione a aba:", ["🏠 Início", "📊 Dados Destinação", "🎁 Itens Doados", "ℹ️ Sobre"])
     
@@ -267,13 +263,13 @@ def show_sobre():
     st.markdown("""
     ## 🏛️ Sobre o Programa
     
-    O **Programa Sustentare** é uma iniciativa da **DTI/SEDES** para promover a sustentabilidade 
+    O **Programa Sustentare** é uma iniciativa do **Governo do Estado** para promover a sustentabilidade 
     através da destinação adequada de resíduos e doação de equipamentos.
     
     ## 🎯 Objetivos
     
     - **Destinação ambientalmente adequada** de resíduos eletrônicos
-    - **Recondicionamento e doação** de equipamentos de informática
+    - **Recondicionamento e doação** de equipamentos eletônicos
     - **Inclusão digital** através de equipamentos reutilizados
     - **Redução do impacto ambiental** do descarte inadequado
     
@@ -281,17 +277,17 @@ def show_sobre():
     
     1. **Coleta** - Recebimento de equipamentos e materiais
     2. **Triagem** - Avaliação e classificação dos itens
-    3. **Recondicionamento** - Reparo e preparação para uso
-    4. **Destinação** - Doação ou reciclagem adequada
+    3. **Recondicionamento** - Reparo e preparação de computadores para uso
+    4. **Destinação** - Doação ou reciclagem adequada para entidades cadastradas.
     
     ## 👥 Equipe
     
-    - **DTI** - Departamento de Tecnologia da Informação
-    - **SEDES** - Secretaria de Desenvolvimento Social
+    - **Programa Sustentare** - Coordenação do Programa - Secretaria de Desenvolvimento Social
     
     ## 📞 Contato
-    
-    Para mais informações: **sustentare@sedes.gov.br**
+    Coordenador: Dionatan Aristimunha
+    coordenacao-sustentare@social.rs.gov.br
+    Para mais informações: **sustentare@procergs.rs.gov.br**
     """)
 
 if __name__ == "__main__":
