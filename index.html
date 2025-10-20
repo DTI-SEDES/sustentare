@@ -257,5 +257,358 @@
                     <div class="region-selector">
                         <div class="region-btn active" data-region="all">Todas as Regiões</div>
                         <div class="region-btn" data-region="metropolitana">Metropolitana</div>
-                        <
-Sistema de Monitoramento - Programa Sustentare
+                        <div class="region-btn" data-region="norte">Norte</div>
+                        <div class="region-btn" data-region="sul">Sul</div>
+                        <div class="region-btn" data-region="leste">Leste</div>
+                        <div class="region-btn" data-region="oeste">Oeste</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mapa e Lista -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-map-marked-alt me-2"></i>Distribuição por Cidades - Rio Grande do Sul
+                    </div>
+                    <div class="card-body">
+                        <div class="map-container">
+                            <!-- Mapa do RS será renderizado via JavaScript -->
+                            <div class="rs-map" id="rs-map">
+                                <!-- Marcadores de cidades serão adicionados via JavaScript -->
+                            </div>
+                            
+                            <div class="legend">
+                                <div class="legend-item">
+                                    <div class="legend-color high"></div>
+                                    <span>Alto percentual</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color medium"></div>
+                                    <span>Médio percentual</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color low"></div>
+                                    <span>Baixo percentual</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="city-info" id="city-info" style="display: none;">
+                            <h5 id="city-name"></h5>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <strong>Percentual de Recebimento:</strong>
+                                    <div class="progress">
+                                        <div class="progress-bar" id="city-percent-bar" role="progressbar"></div>
+                                    </div>
+                                    <span id="city-percent-text"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Região:</strong> <span id="city-region"></span><br>
+                                    <strong>Status:</strong> <span id="city-status"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-list me-2"></i>Lista de Cidades Recebedoras
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Cidade</th>
+                                        <th>Região</th>
+                                        <th>Percentual</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cities-table">
+                                    <!-- Dados serão preenchidos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i>Distribuição por Região
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="regionChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h6>Programa Sustentare - Sistema de Monitoramento</h6>
+                    <p class="mb-0">Monitoramento de cidades recebedoras no Rio Grande do Sul</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p class="mb-0">Última atualização: <span id="last-update"></span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Dados das cidades do Rio Grande do Sul
+        const citiesData = [
+            { name: "Porto Alegre", region: "metropolitana", percent: 18.5, x: 65, y: 75 },
+            { name: "Caxias do Sul", region: "norte", percent: 12.2, x: 75, y: 45 },
+            { name: "Pelotas", region: "sul", percent: 9.8, x: 50, y: 90 },
+            { name: "Canoas", region: "metropolitana", percent: 8.7, x: 60, y: 70 },
+            { name: "Santa Maria", region: "central", percent: 7.5, x: 40, y: 60 },
+            { name: "Gravataí", region: "metropolitana", percent: 6.9, x: 65, y: 68 },
+            { name: "Viamão", region: "metropolitana", percent: 5.8, x: 68, y: 72 },
+            { name: "Novo Hamburgo", region: "metropolitana", percent: 5.2, x: 70, y: 65 },
+            { name: "São Leopoldo", region: "metropolitana", percent: 4.8, x: 68, y: 67 },
+            { name: "Rio Grande", region: "sul", percent: 4.5, x: 45, y: 95 },
+            { name: "Alvorada", region: "metropolitana", percent: 3.9, x: 63, y: 70 },
+            { name: "Passo Fundo", region: "norte", percent: 3.5, x: 55, y: 35 },
+            { name: "Sapucaia do Sul", region: "metropolitana", percent: 3.2, x: 67, y: 68 },
+            { name: "Uruguaiana", region: "oeste", percent: 2.8, x: 20, y: 50 },
+            { name: "Santa Cruz do Sul", region: "central", percent: 2.5, x: 55, y: 55 },
+            { name: "Cachoeirinha", region: "metropolitana", percent: 2.3, x: 64, y: 69 },
+            { name: "Bagé", region: "sul", percent: 2.1, x: 35, y: 85 },
+            { name: "Bento Gonçalves", region: "norte", percent: 1.9, x: 78, y: 48 },
+            { name: "Erechim", region: "norte", percent: 1.7, x: 65, y: 30 },
+            { name: "Guaíba", region: "metropolitana", percent: 1.5, x: 62, y: 72 }
+        ];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            renderMap();
+            loadCitiesTable();
+            initializeRegionChart();
+            setupEventListeners();
+        });
+
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = 
+                now.toLocaleDateString('pt-BR');
+            document.getElementById('last-update').textContent = 
+                now.toLocaleDateString('pt-BR');
+        }
+
+        function renderMap() {
+            const mapContainer = document.getElementById('rs-map');
+            
+            // Limpa marcadores existentes
+            const existingMarkers = document.querySelectorAll('.city-marker');
+            existingMarkers.forEach(marker => marker.remove());
+            
+            // Adiciona marcadores para cada cidade
+            citiesData.forEach(city => {
+                const marker = document.createElement('div');
+                marker.className = `city-marker ${getPercentClass(city.percent)}`;
+                marker.style.left = `${city.x}%`;
+                marker.style.top = `${city.y}%`;
+                marker.setAttribute('data-city', city.name);
+                marker.setAttribute('title', `${city.name} - ${city.percent}%`);
+                
+                marker.addEventListener('click', function() {
+                    showCityInfo(city);
+                });
+                
+                mapContainer.appendChild(marker);
+            });
+        }
+
+        function getPercentClass(percent) {
+            if (percent >= 10) return 'high';
+            if (percent >= 5) return 'medium';
+            return 'low';
+        }
+
+        function showCityInfo(city) {
+            document.getElementById('city-info').style.display = 'block';
+            document.getElementById('city-name').textContent = city.name;
+            document.getElementById('city-percent-bar').style.width = `${city.percent}%`;
+            document.getElementById('city-percent-text').textContent = `${city.percent}%`;
+            document.getElementById('city-region').textContent = getRegionName(city.region);
+            document.getElementById('city-status').textContent = getStatusByPercent(city.percent);
+            
+            // Atualiza a cor da barra de progresso
+            const percentBar = document.getElementById('city-percent-bar');
+            percentBar.className = 'progress-bar';
+            if (city.percent >= 10) {
+                percentBar.classList.add('bg-success');
+            } else if (city.percent >= 5) {
+                percentBar.classList.add('bg-warning');
+            } else {
+                percentBar.classList.add('bg-info');
+            }
+        }
+
+        function getRegionName(region) {
+            const regions = {
+                'metropolitana': 'Metropolitana',
+                'norte': 'Norte',
+                'sul': 'Sul',
+                'leste': 'Leste',
+                'oeste': 'Oeste',
+                'central': 'Central'
+            };
+            return regions[region] || region;
+        }
+
+        function getStatusByPercent(percent) {
+            if (percent >= 10) return 'Alto recebimento';
+            if (percent >= 5) return 'Médio recebimento';
+            return 'Baixo recebimento';
+        }
+
+        function loadCitiesTable() {
+            const table = document.getElementById('cities-table');
+            table.innerHTML = '';
+            
+            // Ordena cidades por percentual (maior para menor)
+            const sortedCities = [...citiesData].sort((a, b) => b.percent - a.percent);
+            
+            sortedCities.forEach(city => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${city.name}</td>
+                    <td>${getRegionName(city.region)}</td>
+                    <td>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar ${getPercentClass(city.percent)}" 
+                                 style="width: ${city.percent}%"></div>
+                        </div>
+                        <small>${city.percent}%</small>
+                    </td>
+                `;
+                
+                row.addEventListener('click', function() {
+                    showCityInfo(city);
+                });
+                
+                table.appendChild(row);
+            });
+        }
+
+        function initializeRegionChart() {
+            const ctx = document.getElementById('regionChart').getContext('2d');
+            
+            // Calcula totais por região
+            const regionTotals = {};
+            citiesData.forEach(city => {
+                if (!regionTotals[city.region]) {
+                    regionTotals[city.region] = 0;
+                }
+                regionTotals[city.region] += city.percent;
+            });
+            
+            const regions = Object.keys(regionTotals);
+            const data = Object.values(regionTotals);
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: regions.map(region => getRegionName(region)),
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#2196F3',
+                            '#FF9800',
+                            '#9C27B0',
+                            '#F44336',
+                            '#00BCD4'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed.toFixed(1)}% (${percentage}% do total)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Pesquisa de cidades
+            document.getElementById('city-search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const resultsContainer = document.getElementById('search-results');
+                
+                if (searchTerm.length < 2) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+                
+                const filteredCities = citiesData.filter(city => 
+                    city.name.toLowerCase().includes(searchTerm)
+                );
+                
+                if (filteredCities.length > 0) {
+                    resultsContainer.innerHTML = '';
+                    filteredCities.forEach(city => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.textContent = `${city.name} - ${getRegionName(city.region)} (${city.percent}%)`;
+                        item.addEventListener('click', function() {
+                            document.getElementById('city-search').value = city.name;
+                            resultsContainer.style.display = 'none';
+                            showCityInfo(city);
+                        });
+                        resultsContainer.appendChild(item);
+                    });
+                    resultsContainer.style.display = 'block';
+                } else {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+            
+            // Fecha resultados ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('search-results').style.display = 'none';
+                }
+            });
+            
+            // Filtros por região
+            document.querySelectorAll('.region-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const region = this.getAttribute('data-region');
+                    filterBy
