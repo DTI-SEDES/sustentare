@@ -61,4 +61,412 @@ class DataProcessor:
     """Classe para processar e validar dados do Sustentare"""
     
     @staticmethod
-    def process_destinacao_data(df)
+    def process_destinacao_data(df):
+        """Processa dados de destinação"""
+        required_columns = ['Ano', 'Mês', 'Peso_kg']
+        
+        # Verificar colunas necessárias
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Colunas obrigatórias faltando: {missing_columns}")
+        
+        # Converter tipos de dados
+        df['Ano'] = pd.to_numeric(df['Ano'], errors='coerce')
+        df['Peso_kg'] = pd.to_numeric(df['Peso_kg'], errors='coerce')
+        
+        # Remover linhas com valores NaN nas colunas críticas
+        df = df.dropna(subset=['Ano', 'Peso_kg'])
+        
+        # Validar meses
+        meses_validos = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+        df = df[df['Mês'].isin(meses_validos)]
+        
+        return df
+    
+    @staticmethod
+    def process_doacao_data(df):
+        """Processa dados de doação"""
+        required_columns = ['Ano', 'Mês', 'Quantidade']
+        
+        # Verificar colunas necessárias
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Colunas obrigatórias faltando: {missing_columns}")
+        
+        # Converter tipos de dados
+        df['Ano'] = pd.to_numeric(df['Ano'], errors='coerce')
+        df['Quantidade'] = pd.to_numeric(df['Quantidade'], errors='coerce')
+        
+        # Remover linhas com valores NaN nas colunas críticas
+        df = df.dropna(subset=['Ano', 'Quantidade'])
+        
+        # Validar meses
+        meses_validos = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+        df = df[df['Mês'].isin(meses_validos)]
+        
+        return df
+    
+    @staticmethod
+    def process_recebedores_data(df):
+        """Processa dados de recebedores"""
+        required_columns = ['Ano', 'Recebedor', 'Quantidade']
+        
+        # Verificar colunas necessárias
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Colunas obrigatórias faltando: {missing_columns}")
+        
+        # Converter tipos de dados
+        df['Ano'] = pd.to_numeric(df['Ano'], errors='coerce')
+        df['Quantidade'] = pd.to_numeric(df['Quantidade'], errors='coerce')
+        
+        # Remover linhas com valores NaN nas colunas críticas
+        df = df.dropna(subset=['Ano', 'Recebedor', 'Quantidade'])
+        
+        return df
+
+def setup_data_upload():
+    """Configura a interface de upload de dados"""
+    
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📤 Upload de Dados")
+    
+    # Modo de operação
+    modo = st.sidebar.radio(
+        "Modo de Operação:",
+        ["📊 Usar Dados de Exemplo", "📁 Upload de Planilha"]
+    )
+    
+    if modo == "📊 Usar Dados de Exemplo":
+        return "exemplo"
+    else:
+        return "upload"
+
+def handle_file_upload():
+    """Gerencia o upload de arquivos Excel"""
+    
+    st.markdown('<div class="section-header">📁 Upload de Planilha Excel</div>', unsafe_allow_html=True)
+    
+    # Instruções
+    with st.expander("📋 Instruções para Upload", expanded=True):
+        st.markdown("""
+        ### Estrutura Esperada da Planilha Excel:
+        
+        A planilha deve conter **3 abas** com os seguintes nomes e colunas:
+        
+        #### 1. Aba: `destinacao`
+        - `Ano`: Ano dos dados (ex: 2024)
+        - `Mês`: Mês em formato texto (JAN, FEV, MAR, ..., DEZ)
+        - `Peso_kg`: Peso em quilogramas
+        
+        #### 2. Aba: `doacao`  
+        - `Ano`: Ano dos dados
+        - `Mês`: Mês em formato texto
+        - `Quantidade`: Número de doações
+        
+        #### 3. Aba: `recebedores`
+        - `Ano`: Ano dos dados
+        - `Recebedor`: Nome da entidade recebedora
+        - `Quantidade`: Quantidade recebida
+        
+        ### 📝 Dicas:
+        - Use os nomes exatos das abas e colunas
+        - Os meses devem estar em português (JAN, FEV, MAR, etc.)
+        - Valores numéricos devem estar no formato correto
+        """)
+    
+    # Upload do arquivo
+    uploaded_file = st.file_uploader(
+        "Selecione o arquivo Excel:",
+        type=['xlsx', 'xls'],
+        help="Arquivo Excel com as 3 abas: destinacao, doacao, recebedores"
+    )
+    
+    if uploaded_file is not None:
+        try:
+            # Ler o arquivo Excel
+            excel_file = pd.ExcelFile(uploaded_file)
+            sheet_names = excel_file.sheet_names
+            
+            st.success(f"✅ Arquivo carregado com sucesso! Abas encontradas: {', '.join(sheet_names)}")
+            
+            # Verificar abas necessárias
+            required_sheets = ['destinacao', 'doacao', 'recebedores']
+            missing_sheets = [sheet for sheet in required_sheets if sheet not in sheet_names]
+            
+            if missing_sheets:
+                st.error(f"❌ Abas faltando: {', '.join(missing_sheets)}")
+                return None, None, None
+            
+            # Processar cada aba
+            processor = DataProcessor()
+            
+            with st.spinner("Processando dados de destinação..."):
+                dest_df = pd.read_excel(uploaded_file, sheet_name='destinacao')
+                dest_df = processor.process_destinacao_data(dest_df)
+                st.success(f"✅ Dados de destinação: {len(dest_df)} registros")
+            
+            with st.spinner("Processando dados de doação..."):
+                doacao_df = pd.read_excel(uploaded_file, sheet_name='doacao')
+                doacao_df = processor.process_doacao_data(doacao_df)
+                st.success(f"✅ Dados de doação: {len(doacao_df)} registros")
+            
+            with st.spinner("Processando dados de recebedores..."):
+                recebedores_df = pd.read_excel(uploaded_file, sheet_name='recebedores')
+                recebedores_df = processor.process_recebedores_data(recebedores_df)
+                st.success(f"✅ Dados de recebedores: {len(recebedores_df)} registros")
+            
+            # Resumo dos dados
+            st.markdown("### 📊 Resumo dos Dados Carregados")
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("Destinação", f"{len(dest_df)} registros")
+            with col2:
+                st.metric("Doações", f"{len(doacao_df)} registros")
+            with col3:
+                st.metric("Recebedores", f"{len(recebedores_df)} registros")
+            
+            # Pré-visualização dos dados
+            with st.expander("👀 Pré-visualização dos Dados"):
+                tab1, tab2, tab3 = st.tabs(["Destinação", "Doações", "Recebedores"])
+                
+                with tab1:
+                    st.dataframe(dest_df.head(10), use_container_width=True)
+                with tab2:
+                    st.dataframe(doacao_df.head(10), use_container_width=True)
+                with tab3:
+                    st.dataframe(recebedores_df.head(10), use_container_width=True)
+            
+            return dest_df, doacao_df, recebedores_df
+            
+        except Exception as e:
+            st.error(f"❌ Erro ao processar arquivo: {str(e)}")
+            return None, None, None
+    
+    return None, None, None
+
+@st.cache_data
+def load_sample_data():
+    """Carrega dados de exemplo para demonstração"""
+    # Seus dados de exemplo originais aqui...
+    # (mantenha os dados que você já tinha)
+    return dest_df, doacao_df, recebedores_df
+
+def create_dashboard(dest_df, doacao_df, recebedores_df):
+    """Cria o dashboard principal"""
+    
+    current_year = datetime.now().year
+    
+    # Sidebar para filtros
+    st.sidebar.title("🔧 Filtros")
+    
+    # Filtro por ano
+    anos_disponiveis = sorted(dest_df['Ano'].unique()) if not dest_df.empty else [current_year]
+    ano_selecionado = st.sidebar.selectbox(
+        "Selecione o Ano:",
+        options=anos_disponiveis,
+        index=len(anos_disponiveis)-1
+    )
+    
+    # Filtro por mês
+    meses = ['TODOS'] + ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+    mes_selecionado = st.sidebar.selectbox("Selecione o Mês:", options=meses)
+    
+    # Aplicar filtros
+    dest_filtrado = dest_df[dest_df['Ano'] == ano_selecionado] if not dest_df.empty else dest_df
+    doacao_filtrado = doacao_df[doacao_df['Ano'] == ano_selecionado] if not doacao_df.empty else doacao_df
+    recebedores_filtrado = recebedores_df[recebedores_df['Ano'] == ano_selecionado] if not recebedores_df.empty else recebedores_df
+    
+    if mes_selecionado != 'TODOS':
+        dest_filtrado = dest_filtrado[dest_filtrado['Mês'] == mes_selecionado] if not dest_filtrado.empty else dest_filtrado
+        doacao_filtrado = doacao_filtrado[doacao_filtrado['Mês'] == mes_selecionado] if not doacao_filtrado.empty else doacao_filtrado
+    
+    return dest_filtrado, doacao_filtrado, recebedores_filtrado, ano_selecionado, mes_selecionado
+
+def display_metrics(dest_df, doacao_df, recebedores_df, ano, mes, data_source):
+    """Exibe métricas principais"""
+    
+    source_badge = "📊" if data_source == "exemplo" else "📁"
+    st.markdown(f'<div class="main-header">{source_badge} Dashboard Sustentare - {ano}</div>', unsafe_allow_html=True)
+    
+    if data_source == "upload":
+        st.success("✅ Dados carregados via upload")
+    
+    if mes != 'TODOS':
+        st.subheader(f"Filtro Ativo: {mes}/{ano}")
+    
+    # Métricas em colunas
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        total_peso = dest_df['Peso_kg'].sum() if not dest_df.empty else 0
+        st.metric(
+            label="📦 Total Destinado (kg)",
+            value=f"{total_peso:,.0f}",
+            delta=f"{total_peso/1000:.1f} ton" if total_peso > 0 else None
+        )
+    
+    with col2:
+        total_doacoes = doacao_df['Quantidade'].sum() if not doacao_df.empty else 0
+        st.metric(
+            label="🎁 Total de Doações",
+            value=f"{total_doacoes:,.0f}",
+            delta=None
+        )
+    
+    with col3:
+        total_recebedores = recebedores_df['Recebedor'].nunique() if not recebedores_df.empty else 0
+        st.metric(
+            label="🏢 Recebedores Únicos",
+            value=f"{total_recebedores}",
+            delta=None
+        )
+    
+    with col4:
+        if not dest_df.empty and len(dest_df) > 0:
+            media_mensal = dest_df.groupby('Mês')['Peso_kg'].sum().mean()
+            st.metric(
+                label="📈 Média Mensal (kg)",
+                value=f"{media_mensal:,.0f}",
+                delta=None
+            )
+        else:
+            st.metric(
+                label="📈 Média Mensal (kg)",
+                value="0",
+                delta=None
+            )
+
+# ... (mantenha as outras funções create_charts, search_functionality, etc.)
+
+def main():
+    """Função principal"""
+    
+    # Configurar upload de dados
+    data_mode = setup_data_upload()
+    
+    if data_mode == "exemplo":
+        # Usar dados de exemplo
+        dest_df, doacao_df, recebedores_df = load_sample_data()
+        data_source = "exemplo"
+    else:
+        # Upload de dados
+        dest_df, doacao_df, recebedores_df = handle_file_upload()
+        data_source = "upload"
+        
+        # Se não há dados carregados, mostrar instruções
+        if dest_df is None and doacao_df is None and recebedores_df is None:
+            st.info("📝 Faça upload de um arquivo Excel para visualizar os dados")
+            return
+    
+    # Verificar se temos dados para mostrar
+    if (dest_df is not None and not dest_df.empty) or (doacao_df is not None and not doacao_df.empty):
+        
+        # Criar dashboard com os dados
+        dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes = create_dashboard(
+            dest_df, doacao_df, recebedores_df
+        )
+        
+        # Exibir métricas
+        display_metrics(dest_filtrado, doacao_filtrado, recebedores_filtrado, ano, mes, data_source)
+        
+        # Layout em abas (mantenha o restante do seu código existente)
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Visualizações", "🔍 Busca", "📋 Dados"])
+        
+        with tab1:
+            st.markdown('<div class="section-header">📈 Visualizações Principais</div>', unsafe_allow_html=True)
+            create_charts(dest_filtrado, doacao_filtrado, recebedores_filtrado)
+        
+        with tab2:
+            # ... (código existente)
+            pass
+        
+        with tab3:
+            search_functionality(recebedores_df)
+        
+        with tab4:
+            show_raw_data(dest_df, doacao_df, recebedores_df, data_source)
+    
+    else:
+        st.warning("⚠️ Nenhum dado disponível para visualização. Use dados de exemplo ou faça upload de uma planilha.")
+
+def search_functionality(recebedores_df):
+    """Funcionalidade de busca"""
+    st.markdown('<div class="section-header">🔍 Busca Avançada</div>', unsafe_allow_html=True)
+    
+    with st.expander("Buscar por Recebedor"):
+        if recebedores_df is None or recebedores_df.empty:
+            st.info("📝 Nenhum dado de recebedores disponível para busca")
+            return
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            termo_busca = st.text_input("Digite o nome do recebedor:")
+        
+        with col2:
+            st.write("")  # Espaçamento
+            buscar = st.button("🔎 Buscar")
+        
+        if buscar and termo_busca:
+            resultados = recebedores_df[
+                recebedores_df['Recebedor'].str.contains(termo_busca, case=False, na=False)
+            ]
+            
+            if not resultados.empty:
+                st.success(f"✅ Encontrados {len(resultados)} resultados")
+                
+                # Agrupar por recebedor
+                resumo = resultados.groupby('Recebedor').agg({
+                    'Quantidade': 'sum',
+                    'Ano': 'count'
+                }).reset_index()
+                resumo.columns = ['Recebedor', 'Total Recebido', 'Número de Ocorrências']
+                
+                st.dataframe(
+                    resumo.sort_values('Total Recebido', ascending=False),
+                    use_container_width=True
+                )
+            else:
+                st.warning("❌ Nenhum resultado encontrado")
+
+def show_raw_data(dest_df, doacao_df, recebedores_df, data_source):
+    """Mostra dados brutos"""
+    st.markdown('<div class="section-header">📋 Dados Brutos</div>', unsafe_allow_html=True)
+    
+    if data_source == "upload":
+        st.success("✅ Dados carregados via upload")
+    
+    dataset = st.selectbox(
+        "Selecione o conjunto de dados:",
+        ["Destinação", "Doações", "Recebedores"]
+    )
+    
+    if dataset == "Destinação" and dest_df is not None and not dest_df.empty:
+        st.dataframe(dest_df, use_container_width=True)
+        
+        # Estatísticas descritivas
+        st.markdown("#### 📊 Estatísticas Descritivas - Destinação")
+        st.write(dest_df['Peso_kg'].describe())
+        
+    elif dataset == "Doações" and doacao_df is not None and not doacao_df.empty:
+        st.dataframe(doacao_df, use_container_width=True)
+        
+        # Estatísticas descritivas
+        st.markdown("#### 📊 Estatísticas Descritivas - Doações")
+        st.write(doacao_df['Quantidade'].describe())
+        
+    elif dataset == "Recebedores" and recebedores_df is not None and not recebedores_df.empty:
+        st.dataframe(recebedores_df, use_container_width=True)
+        
+        # Estatísticas descritivas
+        st.markdown("#### 📊 Estatísticas Descritivas - Recebedores")
+        st.write(recebedores_df['Quantidade'].describe())
+    else:
+        st.info("ℹ️ Nenhum dado disponível para o conjunto selecionado")
+
+# ... (mantenha as funções create_charts e load_sample_data do código anterior)
+
+if __name__ == "__main__":
+    main()
