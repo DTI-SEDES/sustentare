@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Doações</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h2>Doações</h2></header>
+<form>
+  Mês: <select id="mes"></select>
+  Ano: <select id="ano"></select>
+  Quantidade: <input type="number" id="qtdMin" placeholder="min">
+  <button type="button" onclick="filtrar()">Filtrar</button>
+</form>
+<table id="table"><thead>
+<tr>
+  <th>Recebedor</th><th>Município</th><th>Tipo</th><th>Qtd</th><th>Total mês</th><th>Data entrega</th>
+</tr></thead><tbody></tbody></table>
+<script src="main.js"></script>
+</body>
+</html>
