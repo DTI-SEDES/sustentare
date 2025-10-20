@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> em desenvolvimento dados inclusos meramente ilustrativos. - Sustentare</title>
+    <title>Programa Sustentare - Sistema de Monitoramento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -69,49 +69,11 @@
             border-radius: 10px 10px 0 0 !important;
         }
         
-        .indicator-card {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .indicator-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--verde-primario);
-            margin: 10px 0;
-        }
-        
-        .indicator-trend {
-            font-size: 0.9rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-block;
-        }
-        
-        .trend-up {
-            background-color: #e8f5e8;
-            color: var(--verde-primario);
-        }
-        
-        .trend-down {
-            background-color: #ffebee;
-            color: #f44336;
-        }
-        
         .filter-section {
             background-color: var(--verde-claro);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 20px;
         }
         
         .table-responsive {
@@ -124,18 +86,124 @@
             color: white;
         }
         
+        .map-container {
+            position: relative;
+            height: 500px;
+            background-color: #e9f5e9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .rs-map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .city-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--verde-primario);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .city-marker:hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: var(--verde-escuro);
+        }
+        
+        .city-marker.high {
+            background-color: #4CAF50;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .city-marker.medium {
+            background-color: #8BC34A;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .city-marker.low {
+            background-color: #CDDC39;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .search-result-item:hover {
+            background-color: var(--verde-claro);
+        }
+        
+        .city-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 15px;
+        }
+        
         .progress {
-            height: 8px;
+            height: 10px;
             margin-top: 5px;
         }
         
-        .year-filter {
+        .region-selector {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin-bottom: 15px;
         }
         
-        .year-btn {
+        .region-btn {
             padding: 8px 16px;
             border: 2px solid var(--verde-secundario);
             background: white;
@@ -145,37 +213,9 @@
             transition: all 0.3s ease;
         }
         
-        .year-btn.active {
+        .region-btn.active {
             background: var(--verde-secundario);
             color: white;
-        }
-        
-        .kpi-badge {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-left: 5px;
-        }
-        
-        .kpi-met {
-            background-color: var(--verde-claro);
-            color: var(--verde-escuro);
-        }
-        
-        .kpi-not-met {
-            background-color: #ffcdd2;
-            color: #c62828;
-        }
-        
-        .regional-performance {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .regional-name {
-            width: 100px;
-            font-weight: 500;
         }
     </style>
 </head>
@@ -189,7 +229,7 @@
                 </div>
                 <a class="navbar-brand" href="#">
                     <strong>PROGRAMA SUSTENTARE</strong><br>
-                    <small>Sistema de Monitoramento de Indicadores</small>
+                    <small>Monitoramento de Cidades Recebedoras</small>
                 </a>
             </div>
             <div class="navbar-nav ms-auto">
@@ -205,541 +245,17 @@
         <!-- Filtros -->
         <div class="filter-section">
             <div class="row">
-                <div class="col-md-4">
-                    <label class="form-label"><strong>Período de Análise</strong></label>
-                    <div class="year-filter">
-                        <div class="year-btn active" data-years="all">Todos</div>
-                        <div class="year-btn" data-years="2023-2025">2023-2025</div>
-                        <div class="year-btn" data-years="2020-2022">2020-2022</div>
-                        <div class="year-btn" data-years="2017-2019">2017-2019</div>
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Pesquisar Cidade</strong></label>
+                    <div class="search-box">
+                        <input type="text" class="form-control" id="city-search" placeholder="Digite o nome da cidade...">
+                        <div class="search-results" id="search-results"></div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label"><strong>Tipo de Indicador</strong></label>
-                    <select class="form-select" id="indicator-type">
-                        <option value="all">Todos os Indicadores</option>
-                        <option value="operacional">Operacionais</option>
-                        <option value="estrategico">Estratégicos</option>
-                        <option value="sustentabilidade">Sustentabilidade</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label"><strong>Status da Meta</strong></label>
-                    <select class="form-select" id="goal-status">
-                        <option value="all">Todos os Status</option>
-                        <option value="met">Meta Atingida</option>
-                        <option value="not-met">Meta Não Atingida</option>
-                        <option value="partial">Parcialmente Atingida</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cards de KPIs -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-recycle fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-itens">2.847</div>
-                    <div>Itens Descaracterizados</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 15% vs ano anterior
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-hand-holding-heart fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-doacoes">156</div>
-                    <div>Entidades Beneficiadas</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 12% vs ano anterior
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-users fa-2x text-success"></i>
-                    <div class="indicator-value" id="total-pessoas">28.451</div>
-                    <div>Pessoas Atendidas</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 18% vs ano anterior
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="indicator-card">
-                    <i class="fas fa-chart-line fa-2x text-success"></i>
-                    <div class="indicator-value" id="meta-atingida">82%</div>
-                    <div>Meta Anual Atingida</div>
-                    <div class="indicator-trend trend-up">
-                        <i class="fas fa-arrow-up"></i> 3% vs período anterior
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gráficos -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar me-2"></i>Evolução dos Indicadores (2017-2025)
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="evolutionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-chart-pie me-2"></i>Distribuição por Tipo (2024)
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="distributionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabela de Indicadores Detalhados -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-table me-2"></i>Indicadores Detalhados 2017-2025
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Indicador</th>
-                                <th>Tipo</th>
-                                <th>2021</th>
-                                <th>2022</th>
-                                <th>2023</th>
-                                <th>2024</th>
-                                <th>2025 (Meta)</th>
-                                <th>Status</th>
-                                <th>Tendência</th>
-                            </tr>
-                        </thead>
-                        <tbody id="indicators-table">
-                            <!-- Dados serão preenchidos via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Metas por Regional -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <i class="fas fa-map-marker-alt me-2"></i>Desempenho por Regional - 2024
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="chart-container">
-                            <canvas id="regionalChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Desempenho Detalhado por Regional</h6>
-                        <div id="regional-details">
-                            <!-- Detalhes regionais serão preenchidos via JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="bg-dark text-light mt-5 py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <h6>Programa Sustentare - Sistema de Monitoramento</h6>
-                    <p class="mb-0">Baseado nos indicadores de 2017 a 2025 - DTI/SEDES</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <p class="mb-0">Última atualização: <span id="last-update"></span></p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Dados realistas baseados no Programa Sustentare
-        const indicatorsData = {
-            years: [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-            indicators: [
-                {
-                    name: "Itens Descaracterizados",
-                    type: "operacional",
-                    values: [1250, 1450, 1680, 1520, 1850, 2150, 2480, 2847, 3200],
-                    meta2025: 3200,
-                    regional: [620, 580, 750, 520, 377],
-                    unidade: "unidades"
-                },
-                {
-                    name: "Entidades Beneficiadas",
-                    type: "estrategico",
-                    values: [68, 79, 92, 85, 104, 122, 139, 156, 180],
-                    meta2025: 180,
-                    regional: [35, 28, 42, 30, 21],
-                    unidade: "entidades"
-                },
-                {
-                    name: "Pessoas Atendidas",
-                    type: "estrategico",
-                    values: [12500, 14200, 16800, 15800, 19200, 22500, 25800, 28451, 32000],
-                    meta2025: 32000,
-                    regional: [6500, 5800, 7200, 5200, 3751],
-                    unidade: "pessoas"
-                },
-                {
-                    name: "Eficiência na Triagem",
-                    type: "operacional",
-                    values: [65, 68, 72, 70, 75, 78, 82, 85, 90],
-                    meta2025: 90,
-                    regional: [82, 78, 88, 80, 75],
-                    unidade: "%"
-                },
-                {
-                    name: "Redução de Resíduos",
-                    type: "sustentabilidade",
-                    values: [58, 62, 67, 64, 70, 74, 78, 82, 88],
-                    meta2025: 88,
-                    regional: [85, 80, 88, 78, 72],
-                    unidade: "%"
-                },
-                {
-                    name: "Satisfação dos Doadores",
-                    type: "estrategico",
-                    values: [72, 75, 78, 76, 80, 82, 84, 86, 90],
-                    meta2025: 90,
-                    regional: [82, 78, 88, 80, 76],
-                    unidade: "%"
-                },
-                {
-                    name: "Custo por Item Processado",
-                    type: "operacional",
-                    values: [45.80, 42.50, 39.20, 41.80, 38.50, 35.20, 32.80, 30.50, 28.00],
-                    meta2025: 28.00,
-                    regional: [28.20, 31.80, 29.50, 32.20, 33.80],
-                    unidade: "R$"
-                },
-                {
-                    name: "Tempo Médio de Processamento",
-                    type: "operacional",
-                    values: [8.5, 7.8, 7.2, 7.9, 6.8, 6.2, 5.7, 5.2, 4.5],
-                    meta2025: 4.5,
-                    regional: [4.8, 5.8, 4.5, 5.9, 6.2],
-                    unidade: "dias"
-                }
-            ],
-            regionais: ["Capital", "Interior Norte", "Interior Sul", "Interior Leste", "Interior Oeste"]
-        };
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            updateDate();
-            initializeCharts();
-            loadIndicatorsTable();
-            loadRegionalDetails();
-            setupEventListeners();
-            updateKPICards();
-        });
-
-        function updateDate() {
-            const now = new Date();
-            document.getElementById('current-date').textContent = 
-                now.toLocaleDateString('pt-BR');
-            document.getElementById('last-update').textContent = 
-                now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
-        }
-
-        function updateKPICards() {
-            // Atualiza os cards de KPI com dados de 2024
-            const currentYearIndex = 7; // 2024
-            document.getElementById('total-itens').textContent = 
-                indicatorsData.indicators[0].values[currentYearIndex].toLocaleString();
-            document.getElementById('total-doacoes').textContent = 
-                indicatorsData.indicators[1].values[currentYearIndex].toLocaleString();
-            document.getElementById('total-pessoas').textContent = 
-                indicatorsData.indicators[2].values[currentYearIndex].toLocaleString();
-            
-            // Calcula a média de metas atingidas
-            const averageProgress = indicatorsData.indicators.reduce((sum, indicator) => {
-                return sum + (indicator.values[currentYearIndex] / indicator.meta2025 * 100);
-            }, 0) / indicatorsData.indicators.length;
-            
-            document.getElementById('meta-atingida').textContent = 
-                Math.round(averageProgress) + '%';
-        }
-
-        function initializeCharts() {
-            // Gráfico de Evolução (apenas 4 principais indicadores para melhor visualização)
-            const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
-            const mainIndicators = indicatorsData.indicators.slice(0, 4);
-            
-            new Chart(evolutionCtx, {
-                type: 'line',
-                data: {
-                    labels: indicatorsData.years,
-                    datasets: mainIndicators.map((indicator, index) => ({
-                        label: indicator.name,
-                        data: indicator.values,
-                        borderColor: getColor(index),
-                        backgroundColor: getColor(index, 0.1),
-                        borderWidth: 3,
-                        fill: false,
-                        tension: 0.4
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Evolução dos Principais Indicadores (2017-2025)',
-                            font: { size: 16 }
-                        },
-                        legend: {
-                            position: 'bottom',
-                            labels: { padding: 20 }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Valores'
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Gráfico de Distribuição
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(distributionCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: indicatorsData.indicators.map(ind => ind.name),
-                    datasets: [{
-                        data: indicatorsData.indicators.map(ind => ind.values[7]), // 2024
-                        backgroundColor: indicatorsData.indicators.map((_, index) => getColor(index, 0.7)),
-                        borderColor: indicatorsData.indicators.map((_, index) => getColor(index)),
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { boxWidth: 12 }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribuição dos Indicadores - 2024'
-                        }
-                    }
-                }
-            });
-
-            // Gráfico Regional
-            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
-            new Chart(regionalCtx, {
-                type: 'bar',
-                data: {
-                    labels: indicatorsData.regionais,
-                    datasets: [{
-                        label: 'Itens Descaracterizados',
-                        data: indicatorsData.indicators[0].regional,
-                        backgroundColor: getColor(0, 0.8),
-                        borderColor: getColor(0),
-                        borderWidth: 1
-                    }, {
-                        label: 'Entidades Beneficiadas',
-                        data: indicatorsData.indicators[1].regional,
-                        backgroundColor: getColor(1, 0.8),
-                        borderColor: getColor(1),
-                        borderWidth: 1
-                    }, {
-                        label: 'Pessoas Atendidas (centenas)',
-                        data: indicatorsData.indicators[2].regional.map(val => val / 100),
-                        backgroundColor: getColor(2, 0.8),
-                        borderColor: getColor(2),
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Desempenho por Regional - 2024'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Valores'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function loadIndicatorsTable() {
-            const table = document.getElementById('indicators-table');
-            table.innerHTML = '';
-
-            indicatorsData.indicators.forEach(indicator => {
-                const currentValue = indicator.values[7]; // 2024
-                const previousValue = indicator.values[6]; // 2023
-                const trend = ((currentValue - previousValue) / previousValue * 100).toFixed(1);
-                const progress2025 = (currentValue / indicator.meta2025 * 100).toFixed(1);
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${indicator.name}</strong></td>
-                    <td><span class="badge ${getTypeBadgeClass(indicator.type)}">${indicator.type}</span></td>
-                    <td>${formatValue(indicator.values[4], indicator.unidade)}</td>
-                    <td>${formatValue(indicator.values[5], indicator.unidade)}</td>
-                    <td>${formatValue(indicator.values[6], indicator.unidade)}</td>
-                    <td><strong>${formatValue(indicator.values[7], indicator.unidade)}</strong></td>
-                    <td>${formatValue(indicator.meta2025, indicator.unidade)}</td>
-                    <td>
-                        <span class="kpi-badge ${progress2025 >= 100 ? 'kpi-met' : progress2025 >= 80 ? 'kpi-partial' : 'kpi-not-met'}">
-                            ${progress2025}%
-                        </span>
-                        <div class="progress">
-                            <div class="progress-bar ${getProgressBarClass(progress2025)}" 
-                                 style="width: ${Math.min(progress2025, 100)}%"></div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="indicator-trend ${trend >= 0 ? 'trend-up' : 'trend-down'}">
-                            <i class="fas fa-arrow-${trend >= 0 ? 'up' : 'down'}"></i> 
-                            ${Math.abs(trend)}%
-                        </span>
-                    </td>
-                `;
-                table.appendChild(row);
-            });
-        }
-
-        function loadRegionalDetails() {
-            const container = document.getElementById('regional-details');
-            container.innerHTML = '';
-
-            indicatorsData.regionais.forEach((regional, index) => {
-                const card = document.createElement('div');
-                card.className = 'card mb-3';
-                card.innerHTML = `
-                    <div class="card-body">
-                        <h6 class="card-title">${regional}</h6>
-                        <div class="regional-performance">
-                            <span class="regional-name">Itens Processados:</span>
-                            <div class="progress flex-grow-1 mx-2">
-                                <div class="progress-bar" style="width: ${(indicatorsData.indicators[0].regional[index] / Math.max(...indicatorsData.indicators[0].regional) * 100)}%">
-                                    ${indicatorsData.indicators[0].regional[index]}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="regional-performance">
-                            <span class="regional-name">Entidades:</span>
-                            <div class="progress flex-grow-1 mx-2">
-                                <div class="progress-bar bg-success" style="width: ${(indicatorsData.indicators[1].regional[index] / Math.max(...indicatorsData.indicators[1].regional) * 100)}%">
-                                    ${indicatorsData.indicators[1].regional[index]}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="regional-performance">
-                            <span class="regional-name">Pessoas Atendidas:</span>
-                            <div class="progress flex-grow-1 mx-2">
-                                <div class="progress-bar bg-info" style="width: ${(indicatorsData.indicators[2].regional[index] / Math.max(...indicatorsData.indicators[2].regional) * 100)}%">
-                                    ${indicatorsData.indicators[2].regional[index].toLocaleString()}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function setupEventListeners() {
-            document.querySelectorAll('.year-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    applyFilters();
-                });
-            });
-
-            document.getElementById('indicator-type').addEventListener('change', applyFilters);
-            document.getElementById('goal-status').addEventListener('change', applyFilters);
-        }
-
-        function applyFilters() {
-            console.log('Filtros aplicados - Período:', document.querySelector('.year-btn.active').dataset.years);
-            console.log('Tipo:', document.getElementById('indicator-type').value);
-            console.log('Status:', document.getElementById('goal-status').value);
-        }
-
-        // Funções auxiliares
-        function getColor(index, alpha = 1) {
-            const colors = [
-                `rgba(76, 175, 80, ${alpha})`,  // Verde
-                `rgba(33, 150, 243, ${alpha})`, // Azul
-                `rgba(156, 39, 176, ${alpha})`, // Roxo
-                `rgba(255, 152, 0, ${alpha})`,  // Laranja
-                `rgba(0, 188, 212, ${alpha})`,  // Ciano
-                `rgba(103, 58, 183, ${alpha})`, // Índigo
-                `rgba(244, 67, 54, ${alpha})`,  // Vermelho
-                `rgba(121, 85, 72, ${alpha})`   // Marrom
-            ];
-            return colors[index % colors.length];
-        }
-
-        function getTypeBadgeClass(type) {
-            const classes = {
-                'operacional': 'bg-primary',
-                'estrategico': 'bg-success',
-                'sustentabilidade': 'bg-warning text-dark'
-            };
-            return classes[type] || 'bg-secondary';
-        }
-
-        function getProgressBarClass(progress) {
-            progress = parseFloat(progress);
-            if (progress >= 100) return 'bg-success';
-            if (progress >= 80) return 'bg-warning';
-            return 'bg-danger';
-        }
-
-        function formatValue(value, unit) {
-            if (unit === '%') return `${value}%`;
-            if (unit === 'R$') return `R$ ${value.toFixed(2)}`;
-            if (unit === 'dias') return `${value} dias`;
-            return value.toLocaleString();
-        }
-    </script>
-</body>
-</html>
+                <div class="col-md-6">
+                    <label class="form-label"><strong>Região</strong></label>
+                    <div class="region-selector">
+                        <div class="region-btn active" data-region="all">Todas as Regiões</div>
+                        <div class="region-btn" data-region="metropolitana">Metropolitana</div>
+                        <
+Sistema de Monitoramento - Programa Sustentare
